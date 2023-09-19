@@ -1,6 +1,14 @@
 # Prerequisites
 *.d
+*.vs
+.vcxproj
+.filters
+.user
 
+
+# Build
+bin/
+bin-int/
 
 # Compiled Object files
 *.slo

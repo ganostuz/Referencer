@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="OS">
+      <UniqueIdentifier>{C7745900-B300-880B-1CAF-880B085A880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="events">
+      <UniqueIdentifier>{5A9D08FC-463F-33D2-2FFA-46261B3BBA22}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\OS\WindowsWindow.h">
+      <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h" />
+    <ClInclude Include="src\events\ApplicationEvents.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events\Event.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events\KeyEvent.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events\MouseEvent.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rfpch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\OS\WindowsWindow.cpp">
+      <Filter>OS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\rfpch.cpp" />
+  </ItemGroup>
+</Project>
