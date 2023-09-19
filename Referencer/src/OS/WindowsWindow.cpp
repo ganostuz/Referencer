@@ -39,8 +39,104 @@ namespace Referencer {
 
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_window);
-		//glfwSetWindowUserPointer(m_window, this); // id ont't know if i want this
+		glfwSetWindowUserPointer(m_window, this); // you want this
 		setVSync(true);
+
+		//glfw window callbacks
+		glfwSetErrorCallback([](int signature, const char* error) 
+			{
+				std::cout << "[ GLFW ERROR ] [ " << signature << " ] " << error << std::endl;
+			});
+
+		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) 
+			{
+			WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+			win.m_width = width;
+			win.m_height = height;
+
+			WindowResizedEvent e(width, height);
+			win.m_eventCallback(e);
+
+			});
+
+		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+				WindowCloseEvent e;
+				win.m_eventCallback(e);
+			});
+
+		glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					KeyPressedEvent e(key, 0);
+					win.m_eventCallback(e);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					KeyReleasedEvent e(key);
+					win.m_eventCallback(e);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					KeyPressedEvent e(key, 1);
+					win.m_eventCallback(e);
+					break;
+				}
+				}
+			});
+		/* implement this later
+		glfwSetCharCallback(m_window, [](GLFWwindow* window, unsigned int keycode)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				KeyTypedEvent e(keycode);
+				win.eventCallback(e);;
+			});
+		*/
+		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					MouseButtonPressed e(button);
+					win.m_eventCallback(e);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					MouseButtonReleased e(button);
+					win.m_eventCallback(e);
+					break;
+				}
+				}
+			});
+
+		glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xOffset, double yOffset)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				MouseScrolledEvent e((float)xOffset, (float)yOffset);
+				win.m_eventCallback(e);
+			});
+
+		glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xPos, double yPos)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				MouseMovedEvent e((float)xPos, (float)yPos);
+				win.m_eventCallback(e);
+			});
 	}
 
 	void WindowsWindow::onUpdate()
@@ -63,6 +159,4 @@ namespace Referencer {
 	{
 		return m_VSync;
 	}
-
-
 }

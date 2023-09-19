@@ -54,11 +54,11 @@ namespace Referencer {
 		}
 
 		template<typename T>
-		bool Dispatch(EventFn<T> func)
+		bool dispatch(EventFn<T> func)
 		{
 			if (m_Event.getEventType() == T::getStaticType())
 			{
-				m_Event.setHandled(func(*(T*)&m_Event));
+				m_Event.setHandled(func(*(T*)&m_Event)); // nie som si isty ci bude dobre ukazovat
 				return true;
 			}
 			return false;
