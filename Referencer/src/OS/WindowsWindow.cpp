@@ -37,6 +37,7 @@ namespace Referencer {
 			s_GLFWInitialized = true; // todo set glfwErrorCallback
 		}
 
+		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // vymysli alternativu alebo si urob resizing sam
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this

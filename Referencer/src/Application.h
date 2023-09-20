@@ -2,6 +2,7 @@
 
 #include "Window.h"
 #include "events\ApplicationEvents.h"
+#include "LayerStack.h"
 
 namespace Referencer {
 	class Application
@@ -13,10 +14,14 @@ namespace Referencer {
 		void onEvent(Event& e);
 		void run();
 
-		bool onWindowClose(WindowCloseEvent& e);
-	private:
+		void pushLayer(Layer* layer);
+		void pushOverlay(Layer* layer);
 
+	private:
+		LayerStack m_layerStack;
 		std::unique_ptr<Window> m_window;
 		bool m_running;
+
+		bool onWindowClose(WindowCloseEvent& e);
 	};
 }

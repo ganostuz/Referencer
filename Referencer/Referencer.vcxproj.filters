@@ -27,6 +27,8 @@
       <Filter>events</Filter>
     </ClInclude>
     <ClInclude Include="src\rfpch.h" />
+    <ClInclude Include="src\Layer.h" />
+    <ClInclude Include="src\LayerStack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -35,5 +37,7 @@
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\rfpch.cpp" />
+    <ClCompile Include="src\Layer.cpp" />
+    <ClCompile Include="src\LayerStack.cpp" />
   </ItemGroup>
 </Project>
