@@ -14,11 +14,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder (solution directory) // keby si zabudol :D
 IncludeDir = {}
 IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
---IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
+IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
 --IncludeDir["ImGui"] = "Referencer/vendor/imgui"
 
 include "Referencer/vendor/GLFW"
---include "Referencer/vendor/Glad"
+include "Referencer/vendor/Glad"
 --include "Referencer/vendor/imgui"
 
 project "Referencer"
@@ -26,7 +26,6 @@ project "Referencer"
 	kind "ConsoleApp"
 	language "C++"
 	staticruntime "on"
-
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -43,14 +42,14 @@ project "Referencer"
 	{
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
-		--"%{IncludeDir.Glad}",
+		"%{IncludeDir.Glad}",
 		--"%{IncludeDir.ImGui}"
 	}
 
 	links 
 	{ 
 		"GLFW",
-		--"Glad",
+		"Glad",
 		--"ImGui",
 		--"opengl32.lib"
 	}

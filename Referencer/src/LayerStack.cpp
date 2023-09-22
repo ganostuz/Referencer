@@ -11,13 +11,15 @@ namespace Referencer {
 	LayerStack::~LayerStack()
 	{
 		for (Layer* layer : m_layers)
+		{
 			delete layer;
+		}
 	}
 
 	void LayerStack::pushLayer(Layer* layer)
 	{
-		m_layers.emplace(m_LayerInsert, layer);
-		m_layers++;
+		m_layers.emplace(m_layers.begin() + m_layerInsert, layer);
+		m_layerInsert++;
 	}
 
 	void LayerStack::pushOverlay(Layer* overlay)

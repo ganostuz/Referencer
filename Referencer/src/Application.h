@@ -4,7 +4,9 @@
 #include "events\ApplicationEvents.h"
 #include "LayerStack.h"
 
+
 namespace Referencer {
+
 	class Application
 	{
 	public:

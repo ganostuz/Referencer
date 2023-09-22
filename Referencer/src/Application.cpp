@@ -1,15 +1,35 @@
 #include "rfpch.h"
 #include "Application.h"
 
-
+#include "glad\glad.h"
 #include "GLFW\glfw3.h"
 
 namespace Referencer {
+
+	class ExampleLayer : public Layer
+	{ 
+	public:
+		ExampleLayer()
+			: Layer("[example layer]")
+		{
+		}
+
+
+		virtual void onUpdate() override {
+			std::cout << "[example layer] updated!" << std::endl;
+		}
+		virtual void onEvent(Event& e) {
+			std::cout << this->getName() << e << std::endl;
+		}
+	};
 	Application::Application()
 	{
+
 		m_running = true;
 		m_window = std::unique_ptr<Window>(Window::create());
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
+
+		pushLayer(new ExampleLayer());
 	}
 	Application::~Application()
 	{

@@ -43,10 +43,16 @@ namespace Referencer {
 		glfwSetWindowUserPointer(m_window, this); // you want this
 		setVSync(true);
 
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			std::cout << "Failed to initialize OpenGL context" << std::endl;
+			exit;
+		}
+
 		//glfw window callbacks
-		glfwSetErrorCallback([](int signature, const char* error) 
+		glfwSetErrorCallback([](int num, const char* error) 
 			{
-				std::cout << "[ GLFW ERROR ] [ " << signature << " ] " << error << std::endl;
+				std::cout << "[ GLFW ERROR ] [ " << num << " ] " << error << std::endl;
 			});
 
 		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) 
