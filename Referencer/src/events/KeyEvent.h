@@ -58,4 +58,21 @@ namespace Referencer {
 			return ss.str();
 		}
 	};
+
+	class KeyTypedEvent : public KeyEvent
+	{
+	public:
+		KeyTypedEvent(int keycode)
+			: KeyEvent(keycode) {}
+
+		static EventType getStaticType() { return EventType::KeyTyped; }
+		EventType getEventType() const override { return getStaticType(); }
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyTypedEvent: " << m_keycode;
+			return ss.str();
+		}
+	};
 }

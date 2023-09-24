@@ -1,11 +1,11 @@
 #include "rfpch.h"
 #include "Application.h"
-
-#include "glad\glad.h"
+#include "UI\Viewport3D.h"
 #include "GLFW\glfw3.h"
+#include "glad\glad.h"
 
 namespace Referencer {
-
+	Application* Application::s_instance = nullptr;
 	class ExampleLayer : public Layer
 	{ 
 	public:
@@ -24,12 +24,13 @@ namespace Referencer {
 	};
 	Application::Application()
 	{
-
+		s_instance = this;
 		m_running = true;
 		m_window = std::unique_ptr<Window>(Window::create());
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
 
 		pushLayer(new ExampleLayer());
+		pushLayer(new Viewport3D());
 	}
 	Application::~Application()
 	{
@@ -39,12 +40,18 @@ namespace Referencer {
 		std::cout << "[APP] " << e << std::endl;
 		EventDispatcher dispatcher(e);
 		dispatcher.dispatch<WindowCloseEvent>(std::bind(&Application::onWindowClose, this, std::placeholders::_1));
+		dispatcher.dispatch<WindowResizedEvent>([](WindowResizedEvent& e) -> bool
+			{
+				glViewport(0, 0, e.getWidth(), e.getHeight());
+
+				return false;// for now
+			}); // window resize, moved and closed events will be handled primarly by application and handled set to false primarly beacause ImGui needs to process it
 
 		for (auto i = m_layerStack.begin(); i != m_layerStack.end(); i++)
 		{
-			(*i)->onEvent(e);
 			if (e.isHandled())
 				break;
+			(*i)->onEvent(e);
 		}
 
 
@@ -53,7 +60,8 @@ namespace Referencer {
 	{
 		while (m_running)
 		{
-
+			glClearColor(.2f, .2f, .2f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
 			for (Layer* layer : m_layerStack)
 				layer->onUpdate();
 

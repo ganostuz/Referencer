@@ -15,11 +15,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
 IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
---IncludeDir["ImGui"] = "Referencer/vendor/imgui"
+IncludeDir["ImGui"] = "Referencer/vendor/imgui"
 
 include "Referencer/vendor/GLFW"
 include "Referencer/vendor/Glad"
---include "Referencer/vendor/imgui"
+include "Referencer/vendor/imGui"
 
 project "Referencer"
 	location "Referencer"
@@ -43,15 +43,15 @@ project "Referencer"
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		--"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}"
 	}
 
 	links 
 	{ 
 		"GLFW",
 		"Glad",
-		--"ImGui",
-		--"opengl32.lib"
+		"ImGui",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"

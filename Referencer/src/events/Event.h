@@ -7,7 +7,7 @@ namespace Referencer {
 	{
 		None = 0,
 		WindowClose, WindowResize, WindowMoved,
-		Keypressed, KeyReleased,
+		Keypressed, KeyReleased,KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 

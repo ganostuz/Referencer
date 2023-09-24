@@ -46,7 +46,7 @@ namespace Referencer {
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			std::cout << "Failed to initialize OpenGL context" << std::endl;
-			exit;
+			exit(-1);
 		}
 
 		//glfw window callbacks
@@ -144,10 +144,18 @@ namespace Referencer {
 				MouseMovedEvent e((float)xPos, (float)yPos);
 				win.m_eventCallback(e);
 			});
+		glfwSetCharCallback(m_window, [](GLFWwindow* window, unsigned int character) 
+			{
+			WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+			KeyTypedEvent e(character);
+			win.m_eventCallback(e);
+			});
 	}
 
 	void WindowsWindow::onUpdate()
 	{
+		
 		glfwPollEvents();
 		glfwSwapBuffers(m_window);
 	}
