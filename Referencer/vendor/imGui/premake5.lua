@@ -1,11 +1,12 @@
-project "imGui"
-    kind "StaticLib"
-    language "C++"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+project "ImGui"
+	kind "StaticLib"
+	language "C++"
 
-    files
-    {
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
         "imconfig.h",
         "imgui.cpp",
         "imgui.h",
@@ -17,9 +18,16 @@ project "imGui"
         "imstb_rectpack.h",
         "imstb_textedit.h",
         "imstb_truetype.h"
-    }
+	}
 
     filter "system:windows"
         systemversion "latest"
         staticruntime "On"
-        
+
+	filter "configurations:Debug"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		runtime "Release"
+		optimize "on"

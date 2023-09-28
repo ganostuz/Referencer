@@ -23,14 +23,8 @@
     <ClInclude Include="src\OS\WindowsWindow.h">
       <Filter>OS</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\ImGui\imgui_impl_glfw.h">
+    <ClInclude Include="src\UI\ImGui\UIlayer.h">
       <Filter>UI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\ImGui\imgui_impl_opengl3.h">
-      <Filter>UI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\Viewport3D.h">
-      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\events\ApplicationEvents.h">
@@ -46,6 +40,9 @@
       <Filter>events</Filter>
     </ClInclude>
     <ClInclude Include="src\rfpch.h" />
+    <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
+    <ClInclude Include="src\UI\ImGui\Viewport.h" />
+    <ClInclude Include="src\UI\ImGui\Viewport3D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -54,16 +51,15 @@
     <ClCompile Include="src\OS\WindowsWindow.cpp">
       <Filter>OS</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\ImGui\imgui_impl_glfw.cpp">
+    <ClCompile Include="src\UI\ImGui\ImGuiBuild.cpp">
       <Filter>UI\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\ImGui\imgui_impl_opengl3.cpp">
+    <ClCompile Include="src\UI\ImGui\UIlayer.cpp">
       <Filter>UI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UI\Viewport3D.cpp">
-      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\rfpch.cpp" />
+    <ClCompile Include="src\UI\ImGui\Viewport2D.cpp" />
+    <ClCompile Include="src\UI\ImGui\Viewport3D.cpp" />
   </ItemGroup>
 </Project>

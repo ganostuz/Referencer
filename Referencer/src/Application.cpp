@@ -1,6 +1,6 @@
 #include "rfpch.h"
 #include "Application.h"
-#include "UI\Viewport3D.h"
+#include "UI\ImGui\UIlayer.h"
 #include "GLFW\glfw3.h"
 #include "glad\glad.h"
 
@@ -30,7 +30,8 @@ namespace Referencer {
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
 
 		pushLayer(new ExampleLayer());
-		pushLayer(new Viewport3D());
+		pushLayer(new UIlayer());
+
 	}
 	Application::~Application()
 	{
