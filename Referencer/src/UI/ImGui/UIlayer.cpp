@@ -1,12 +1,17 @@
 #include "rfpch.h"
+// nema to byt tu platform specific
 #include "UIlayer.h"
-#include <vector>
 #include <imgui.h>
-#include <imgui_internal.h>
 #include "events\KeyEvent.h"
 #include "events\ApplicationEvents.h"
 #include "events\MouseEvent.h"
 #include "KeyCodes.h"
+
+#include "GLFW\glfw3.h"
+#define GLFW_EXPOSE_NATIVE_WIN32 
+#include "GLFW/glfw3native.h"
+#include <commdlg.h>
+
 
 
 //#include "ImGui\imgui_impl_glfw.h"
@@ -16,9 +21,8 @@ namespace Referencer {
     UIlayer::UIlayer()
         : Layer("IMgui layer")
     {
-        //m_viewports.push_back(new Viewport2D("dlhe meno", true));
-        //m_selected.push_back(false);
     }
+    
 
     UIlayer::~UIlayer()
     {
@@ -33,8 +37,10 @@ namespace Referencer {
 
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-        //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+
+
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -49,6 +55,8 @@ namespace Referencer {
         style.PopupRounding = 5.0f;
         style.ScrollbarRounding = 5.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+
+        
 
         //colors
         auto& colors = ImGui::GetStyle().Colors;
@@ -100,54 +108,14 @@ namespace Referencer {
     
     void UIlayer::onUpdate()
     {
+        // first checks if deleted update();
+        // than renders compoments render();
+        // in which helper funcition renderViewports, renderMenu, renderViewportStack, etc
         Begin();
-        for (auto it = m_viewports.begin(); it != m_viewports.end(); it++)
-        {
-            if (!(*it)->isRunning())
-            {
-                delete* it; // to do implement another data structure
-                m_viewports.erase(it);
-                //m_selected.erase(i); // todo seleced remove handling
-                break;
-            }
-            else if((*it)->getIsOpened())
-                (*it)->onUpdate();
-        }
 
+        UpdateViewports();
 
-           ImGui::Begin("layers");
-           if (ImGui::Button("+ 2d viewport")) {
-               m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true));
-               m_selected.push_back(false);
-           }
-           ImGui::SameLine(ImGui::GetWindowWidth() - 100);
-           if (ImGui::Button("+ 3d viewport")) {
-               m_viewports.push_back(new Viewport3D(std::to_string(glfwGetTime()), true));
-               m_selected.push_back(false);
-           }
-
-           for (int i = 0; i < m_viewports.size(); i++)
-           {
-               ImGui::Checkbox(m_viewports[i]->getName().c_str(), &m_viewports[i]->getIsOpened());
-               std::cout << m_viewports[i]->getName().c_str()<< m_viewports[i]->getIsOpened() << std::endl;
-           }
-
-           static bool selection[5] = { false, false, false, false, false };
-           for (int n = 0; n < 5; n++)
-           {
-               char buf[32];
-               sprintf(buf, "Object %d", n);
-               if (ImGui::Selectable(buf, selection[n]))
-               {
-                   if (!ImGui::GetIO().KeyCtrl)    // Clear selection when CTRL is not held
-                       memset(selection, 0, sizeof(selection));
-                   selection[n] ^= 1;
-               }
-               if(!ImGui::IsWindowFocused())
-                   memset(selection, 0, sizeof(selection));
-           }
-
-           ImGui::End();
+        Render();
 
         End();
     }
@@ -159,6 +127,8 @@ namespace Referencer {
         e.setHandled((e.isInCategory(EventCategoryMouse) && io.WantCaptureMouse) ||
             (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));
     }
+
+    // private funcs
 
     void UIlayer::Begin()
     {
@@ -187,6 +157,136 @@ namespace Referencer {
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    void UIlayer::Render()
+    {
+        
+        
+        ImGui::Begin("layers");
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, .0f);
+
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("New", "CTRL + N")) 
+                {
+                    // Handle menu item click
+                }
+                if (ImGui::MenuItem("Save", "CTRL + S"))
+                {
+                    std::cout<<saveFileDialog("Referencer file (*.ref)\0.ref\0") << "-------------------------------------------------------------------" << std::endl;
+                }
+                if (ImGui::MenuItem("Open", "CTRL + O"))
+                {
+                    std::cout <<loadFileDialog("Referencer file (*.ref)\0.ref\0") << "-------------------------------------------------------------------" << std::endl;
+                }
+                if (ImGui::MenuItem("Save as", "CTRL + SHIFT + S")) 
+                {
+                    // Handle menu item click
+                }
+                
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Edit"))
+            {
+                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+                if (ImGui::MenuItem("Redo", "CTRL+Y")) {}  // Disabled item
+                ImGui::Separator();
+                if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+                if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+                if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+                ImGui::EndMenu();
+            }
+            ImGuiIO& io = ImGui::GetIO();
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::EndMainMenuBar();
+        }
+
+        ImGui::PopStyleVar();
+        //menu render only if m_showMenu is true // add this condition
+
+        //layers manager
+        
+
+        if (ImGui::Button("+ 2d viewport")) {
+            m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true));
+            m_selected.push_back(false);
+        }
+        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
+        if (ImGui::Button("+ 3d viewport")) {
+            m_viewports.push_back(new Viewport3D(std::to_string(glfwGetTime()), true));
+            m_selected.push_back(false);
+        }
+        //ImGui::BeginMenu("idk");
+        for (int i = 0; i < m_viewports.size(); i++)
+        {
+            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
+            //ImGui::Checkbox(m_viewports[i]->getName().c_str(), &m_viewports[i]->getIsOpened());
+            std::cout << m_viewports[i]->getName().c_str() << m_viewports[i]->getIsOpened() << std::endl;
+        }
+        //ImGui::EndMenu();
+
+        ImGui::End();
+    }
+
+    void UIlayer::UpdateViewports()
+    {
+        for (auto it = m_viewports.begin(); it != m_viewports.end(); it++)
+        {
+            if (!(*it)->isRunning())
+            {
+                delete* it; // to do implement another data structure
+                m_viewports.erase(it);
+                //m_selected.erase(i); // todo seleced remove handling
+                break;
+            }
+            else if ((*it)->getIsOpened())
+                (*it)->onUpdate();
+        }
+    }
+
+    std::string UIlayer::saveFileDialog(const char* filter)
+    {
+        OPENFILENAMEA ofn;
+        char szFile[260] = { 0 };
+
+        ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
+        ofn.lStructSize = sizeof(OPENFILENAMEA);
+        ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::getApplication().getWindow().getNativeWindow());
+        ofn.lpstrFile = szFile;
+        ofn.nMaxFile = sizeof(szFile);
+        ofn.lpstrFilter = filter;
+        ofn.nFilterIndex = 1;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+        if (GetSaveFileNameA(&ofn) == TRUE)
+        {
+            return ofn.lpstrFile;
+        }
+        return std::string();
+    }
+
+    std::string UIlayer::loadFileDialog(const char* filter)
+    {
+        OPENFILENAMEA ofn;
+        char szFile[260] = { 0 };
+
+        ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
+        ofn.lStructSize = sizeof(OPENFILENAMEA);
+        ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::getApplication().getWindow().getNativeWindow());
+        ofn.lpstrFile = szFile;
+        ofn.nMaxFile = sizeof(szFile);
+        ofn.lpstrFilter = filter;
+        ofn.nFilterIndex = 1;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+        if (GetOpenFileNameA(&ofn) == TRUE)
+        {
+            return ofn.lpstrFile;
+        }
+        return std::string();
     }
 
 }

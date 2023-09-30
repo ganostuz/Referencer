@@ -9,14 +9,14 @@ namespace Referencer {
 
 	static bool s_GLFWInitialized = false; // to be implemented error callback
 
-	Window* Window::create(const WindowProperties& props)
+	Window* Window::create(std::string title, unsigned int width, unsigned int height)
 	{
-		return new WindowsWindow(props);
+		return new WindowsWindow(title, width, height);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProperties& props)
+	WindowsWindow::WindowsWindow(std::string& title, unsigned int width, unsigned int height)
 	{
-		init(props);
+		init(title, width, height);
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -24,11 +24,11 @@ namespace Referencer {
 		glfwDestroyWindow(m_window);
 	}
 
-	void WindowsWindow::init(const WindowProperties& props)
+	void WindowsWindow::init(std::string& title, unsigned int width, unsigned int height)
 	{
-		m_title = props.title;
-		m_width = props.width;
-		m_height = props.height;
+		m_title = title;
+		m_width = width;
+		m_height = height;
 
 		if (!s_GLFWInitialized)
 		{
@@ -36,8 +36,9 @@ namespace Referencer {
 			if (!success) { std::cout << "glfw was not initialized!" << std::endl; }
 			s_GLFWInitialized = true; // todo set glfwErrorCallback
 		}
-
+		
 		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // vymysli alternativu alebo si urob resizing sam
+		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this

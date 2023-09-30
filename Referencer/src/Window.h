@@ -4,20 +4,6 @@
 
 namespace Referencer {
 
-	struct WindowProperties
-	{
-		std::string title;
-		unsigned int width;
-		unsigned int height;
-
-		WindowProperties(const std::string& t_title = "Referencer",
-			unsigned int t_width = 1280,
-			unsigned int t_height = 720)
-			: title(t_title), width(t_width), height(t_height)
-		{
-		}
-	};
-
 	class Window
 	{
 	public:
@@ -37,7 +23,7 @@ namespace Referencer {
 
 		virtual void* getNativeWindow() const = 0;
 
-		static Window* create(const WindowProperties& props = WindowProperties());
+		static Window* create(std::string title = "Referencer", unsigned int width = 1280,unsigned int height = 720);
 	};
 
 }

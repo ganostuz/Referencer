@@ -25,7 +25,6 @@ namespace Referencer {
 
 		if (wasPreviousWindowFocused = ImGui::IsWindowFocused())
 		{
-			
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
 				setRunning(false);
 			if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))

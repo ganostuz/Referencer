@@ -10,7 +10,7 @@ namespace Referencer {
 	class WindowsWindow : public Window
 	{
 	private:
-		virtual void init(const WindowProperties& props);
+		virtual void init(std::string& title, unsigned int width, unsigned int height);// daj window properties prec z window
 
 		GLFWwindow* m_window;
 		std::string m_title;
@@ -21,7 +21,7 @@ namespace Referencer {
 
 		EventCallbackFn m_eventCallback;
 	public:
-		WindowsWindow(const WindowProperties& props);
+		WindowsWindow(std::string& title, unsigned int width, unsigned int height);
 		virtual ~WindowsWindow();
 
 		void onUpdate() override;

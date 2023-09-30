@@ -8,7 +8,8 @@
 #include "Viewport.h"
 #include "Viewport2D.h"
 #include "Viewport3D.h"
-#include "GLFW\glfw3.h"
+
+
 
 namespace Referencer {
 
@@ -16,8 +17,15 @@ namespace Referencer {
 	{
 	private:
 		std::vector<Viewport*> m_viewports;
-		std::vector<bool> m_selected;
+		std::vector<bool> m_selected; // presunie sa do viewportov
 		// meshes and camera rotation matrix
+		void Begin();
+		void End();
+		void Render();
+		void UpdateViewports();
+		std::string saveFileDialog(const char* filter);
+		std::string loadFileDialog(const char* filter);
+
 	public:
 		UIlayer();
 		~UIlayer();
@@ -27,8 +35,7 @@ namespace Referencer {
 		void onUpdate();
 		void onEvent(Event& e);
 
-		void Begin();
-		void End();
+		
 
 	};
 }
