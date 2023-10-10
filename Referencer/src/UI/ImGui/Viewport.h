@@ -15,13 +15,13 @@ namespace Referencer {
 		virtual void onUpdate() = 0;
 		virtual void onEvent(Event& e) = 0;
 
-		inline std::string getName() { return m_name; }
+		inline std::string& getName() { return m_name; }
 		inline bool& getIsOpened() { return m_isOpen; }
 		inline void setOpened(bool open) { m_isOpen = open; }
 		inline bool& isRunning() { return m_running; }
 		inline bool setRunning(bool terminate) { return m_running = terminate; }
 		inline bool& isSelected() { return m_selected; }
-		inline void setSelected(bool select) { m_selected = select; }
+		inline void setSelected(bool select) { m_selected = select;  }
 
 		//inline bool& isOpen() { return *m_isOpen; }
 

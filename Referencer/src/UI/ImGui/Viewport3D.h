@@ -1,6 +1,8 @@
 #pragma once
 #include "Viewport.h"
 
+// this class can be used only in imgui context
+
 namespace Referencer {
 	class Viewport3D : public Viewport
 	{

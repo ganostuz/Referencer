@@ -4,24 +4,11 @@
 #include "GLFW\glfw3.h"
 #include "glad\glad.h"
 
+
+
 namespace Referencer {
+
 	Application* Application::s_instance = nullptr;
-	class ExampleLayer : public Layer
-	{ 
-	public:
-		ExampleLayer()
-			: Layer("[example layer]")
-		{
-		}
-
-
-		virtual void onUpdate() override {
-			std::cout << "[example layer] updated!" << std::endl;
-		}
-		virtual void onEvent(Event& e) {
-			std::cout << this->getName() << e << std::endl;
-		}
-	};
 	Application::Application()
 	{
 		s_instance = this;
@@ -29,7 +16,6 @@ namespace Referencer {
 		m_window = std::unique_ptr<Window>(Window::create());
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
 
-		pushLayer(new ExampleLayer());
 		pushLayer(new UIlayer());
 
 	}
@@ -63,10 +49,13 @@ namespace Referencer {
 		{
 			glClearColor(.2f, .2f, .2f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
+            ;
+
 			for (Layer* layer : m_layerStack)
 				layer->onUpdate();
 
 			m_window->onUpdate();
+
 		}
 	}
 

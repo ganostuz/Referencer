@@ -43,6 +43,8 @@
     <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
     <ClInclude Include="src\UI\ImGui\Viewport.h" />
     <ClInclude Include="src\UI\ImGui\Viewport3D.h" />
+    <ClInclude Include="src\Renderer\Shader.h" />
+    <ClInclude Include="src\Renderer\OpenGL\BufferManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -61,5 +63,7 @@
     <ClCompile Include="src\rfpch.cpp" />
     <ClCompile Include="src\UI\ImGui\Viewport2D.cpp" />
     <ClCompile Include="src\UI\ImGui\Viewport3D.cpp" />
+    <ClCompile Include="src\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\BufferManager.cpp" />
   </ItemGroup>
 </Project>

@@ -38,7 +38,8 @@ namespace Referencer {
 		}
 		
 		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // vymysli alternativu alebo si urob resizing sam
-		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+		//glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+		//glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE); // ak mas proble s fps uncomment
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this
@@ -156,7 +157,6 @@ namespace Referencer {
 
 	void WindowsWindow::onUpdate()
 	{
-		
 		glfwPollEvents();
 		glfwSwapBuffers(m_window);
 	}

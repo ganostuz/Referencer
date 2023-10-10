@@ -1,14 +1,17 @@
 #pragma once
 #include "Viewport.h"
 
+// this class can be used only in imgui context
+
 namespace Referencer {
 	class Viewport2D : public Viewport
 	{
 	private:
-		std::string m_name;
-		bool m_opened;
+		int width, height;
+		float ratio; // width to heigh
+		unsigned int texture;
 	public:
-		Viewport2D(std::string name, bool isOpen);
+		Viewport2D(std::string name, bool isOpen, std::string source);
 
 		virtual void onUpdate() override;
 		virtual void onEvent(Event& e) override;

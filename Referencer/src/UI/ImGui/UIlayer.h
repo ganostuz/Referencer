@@ -17,14 +17,10 @@ namespace Referencer {
 	{
 	private:
 		std::vector<Viewport*> m_viewports;
-		std::vector<bool> m_selected; // presunie sa do viewportov
+		//std::vector<bool> m_selected; // presunie sa do viewportov
+		bool m_showMenu;
 		// meshes and camera rotation matrix
-		void Begin();
-		void End();
-		void Render();
-		void UpdateViewports();
-		std::string saveFileDialog(const char* filter);
-		std::string loadFileDialog(const char* filter);
+		
 
 	public:
 		UIlayer();
@@ -34,6 +30,20 @@ namespace Referencer {
 		void onDetach();
 		void onUpdate();
 		void onEvent(Event& e);
+
+	private:
+
+		void Begin();
+		void End();
+		void Render();
+		void UpdateViewports();
+		std::string saveFileDialog(const char* filter);
+		std::string loadFileDialog(const char* filter);
+
+		void RenderMainMenu();
+		void RenderMenu();
+		void RenderLayerManager();
+		void RenderViewports();
 
 		
 

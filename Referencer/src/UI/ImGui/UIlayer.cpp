@@ -19,7 +19,7 @@
 namespace Referencer {
 
     UIlayer::UIlayer()
-        : Layer("IMgui layer")
+        : Layer("ImGui layer"), m_showMenu(true)
     {
     }
     
@@ -40,8 +40,6 @@ namespace Referencer {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
-
-
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsClassic();
@@ -54,7 +52,8 @@ namespace Referencer {
         style.GrabRounding = 5.0f;
         style.PopupRounding = 5.0f;
         style.ScrollbarRounding = 5.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        
+        // callbacks
 
         
 
@@ -93,7 +92,7 @@ namespace Referencer {
         GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
 
         // Setup Platform/Renderer bindings
-            // Setup Platform/Renderer backends
+        // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
 
@@ -111,24 +110,25 @@ namespace Referencer {
         // first checks if deleted update();
         // than renders compoments render();
         // in which helper funcition renderViewports, renderMenu, renderViewportStack, etc
-        Begin();
+        Begin(); // begins new frame
 
-        UpdateViewports();
+        UpdateViewports(); // deletes viewports with delete flag
 
-        Render();
-
-        End();
+        Render(); // renders components
+        
+        End(); // renders imgui
     }
 
     void UIlayer::onEvent(Event& e)
     {
         std::cout << this->getName() << e << std::endl;
         ImGuiIO& io = ImGui::GetIO();
+        
         e.setHandled((e.isInCategory(EventCategoryMouse) && io.WantCaptureMouse) ||
             (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));
     }
 
-    // private funcs
+    // main private funcs
 
     void UIlayer::Begin()
     {
@@ -136,6 +136,7 @@ namespace Referencer {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        //ImGui::LoadIniSettingsFromMemory(); // from your own file
         ImGui::ShowDemoWindow(&idk);
        
     }
@@ -161,72 +162,15 @@ namespace Referencer {
 
     void UIlayer::Render()
     {
-        
-        
         ImGui::Begin("layers");
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, .0f);
-
-        if (ImGui::BeginMainMenuBar())
-        {
-            if (ImGui::BeginMenu("File"))
-            {
-                if (ImGui::MenuItem("New", "CTRL + N")) 
-                {
-                    // Handle menu item click
-                }
-                if (ImGui::MenuItem("Save", "CTRL + S"))
-                {
-                    std::cout<<saveFileDialog("Referencer file (*.ref)\0.ref\0") << "-------------------------------------------------------------------" << std::endl;
-                }
-                if (ImGui::MenuItem("Open", "CTRL + O"))
-                {
-                    std::cout <<loadFileDialog("Referencer file (*.ref)\0.ref\0") << "-------------------------------------------------------------------" << std::endl;
-                }
-                if (ImGui::MenuItem("Save as", "CTRL + SHIFT + S")) 
-                {
-                    // Handle menu item click
-                }
-                
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Edit"))
-            {
-                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-                if (ImGui::MenuItem("Redo", "CTRL+Y")) {}  // Disabled item
-                ImGui::Separator();
-                if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-                if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-                if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-                ImGui::EndMenu();
-            }
-            ImGuiIO& io = ImGui::GetIO();
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::EndMainMenuBar();
-        }
-
-        ImGui::PopStyleVar();
-        //menu render only if m_showMenu is true // add this condition
-
-        //layers manager
         
+        RenderMainMenu();
 
-        if (ImGui::Button("+ 2d viewport")) {
-            m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true));
-            m_selected.push_back(false);
-        }
-        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
-        if (ImGui::Button("+ 3d viewport")) {
-            m_viewports.push_back(new Viewport3D(std::to_string(glfwGetTime()), true));
-            m_selected.push_back(false);
-        }
-        //ImGui::BeginMenu("idk");
-        for (int i = 0; i < m_viewports.size(); i++)
-        {
-            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
-            //ImGui::Checkbox(m_viewports[i]->getName().c_str(), &m_viewports[i]->getIsOpened());
-            std::cout << m_viewports[i]->getName().c_str() << m_viewports[i]->getIsOpened() << std::endl;
-        }
-        //ImGui::EndMenu();
+        RenderMenu();
+
+        RenderLayerManager();
+
+        RenderViewports();
 
         ImGui::End();
     }
@@ -240,12 +184,15 @@ namespace Referencer {
                 delete* it; // to do implement another data structure
                 m_viewports.erase(it);
                 //m_selected.erase(i); // todo seleced remove handling
+                // if viewport is selected erase
                 break;
             }
             else if ((*it)->getIsOpened())
                 (*it)->onUpdate();
         }
     }
+
+    // seperation of in class funcs
 
     std::string UIlayer::saveFileDialog(const char* filter)
     {
@@ -287,6 +234,141 @@ namespace Referencer {
             return ofn.lpstrFile;
         }
         return std::string();
+    }
+
+    void UIlayer::RenderMainMenu()
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, .0f);
+
+        if (m_showMenu && ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("New", "CTRL + N"))
+                {
+                    // Handle menu item click
+                    // pop up save current layout?
+                    // destroy this instance of UIlayer and viewports
+                    // new UIlayer instance
+                }
+                if (ImGui::MenuItem("Save", "CTRL + S"))
+                {
+                    // take path from memory and save here
+                }
+                if (ImGui::MenuItem("Open", "CTRL + O"))
+                {
+                    std::string path = loadFileDialog("Referencer file (*.ref)\0*.ref\0*.png\0*.png\0*.jpg\0*.jpg\0");
+                    if (path != "")
+                    {
+                        m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true, path));
+                        //m_selected.push_back(false);
+                    }
+                }
+                if (ImGui::MenuItem("Save as", "CTRL + SHIFT + S"))
+                {
+                    std::string path = saveFileDialog("Referencer file (*.ref)\0.ref\0");
+                    if (path != "")
+                    {
+                        // save file
+                    }
+                }
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Edit"))
+            {
+                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+                if (ImGui::MenuItem("Redo", "CTRL+Y")) {}  // Disabled item
+                ImGui::Separator();
+                if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+                if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+                if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+                ImGui::EndMenu();
+            }
+            ImGuiIO& io = ImGui::GetIO();
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::EndMainMenuBar();
+        }
+
+        ImGui::PopStyleVar();
+    }
+
+    void UIlayer::RenderMenu()
+    {
+        ImGuiIO io = ImGui::GetIO();
+        if (ImGui::IsKeyDown(ImGuiKey_MouseRight))
+            ImGui::OpenPopup("my_select_popup");
+        if (ImGui::BeginPopup("my_select_popup"))
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (ImGui::Selectable("menu selectable"))
+                {
+                }
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    void UIlayer::RenderLayerManager()
+    {
+        if (ImGui::Button("+ 2d viewport")) {
+            m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true, "")); // source must not be empty or black screen
+            //m_selected.push_back(false); // selected tiez pojde to viewports
+        }
+        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
+        if (ImGui::Button("+ 3d viewport")) {
+            m_viewports.push_back(new Viewport3D(std::to_string(glfwGetTime()), true));
+            //m_selected.push_back(false);
+        }
+
+        
+    }
+
+    void UIlayer::RenderViewports()
+    {
+        for (int i = 0; i < m_viewports.size(); i++)
+        {
+            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
+            //ImGui::Checkbox(m_viewports[i]->getName().c_str(), &m_viewports[i]->getIsOpened());
+            //std::cout << m_viewports[i]->getName().c_str() << m_viewports[i]->getIsOpened() << std::endl;
+        }
+        //ImGui::EndMenu();
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0,0 });
+        ImGui::Begin("Test");
+        if (ImGui::BeginTable("table", 1, ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable))
+        {
+            for (int i = 0; i < m_viewports.size(); i++)
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 10, 10 });// okliestenie checkbox
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, style.CellPadding.y * 2)); // Fix
+                ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 15, style.CellPadding.y }); // vyska riadku
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 12.5, 0 });
+
+                ImGui::TableNextRow(0, .0f); // min row height
+                ImGui::TableSetColumnIndex(0);
+                ImGui::SetNextItemAllowOverlap();
+                ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
+                //ImGui::Selectable(m_viewports[i]->getName().c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick);
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x * 2, style.ItemSpacing.y)); // Fix
+
+                ImGui::SameLine(ImGui::GetWindowWidth() - 20.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
+                ImGui::Checkbox(("##" + m_viewports[i]->getName()).c_str(), &m_viewports[i]->getIsOpened());
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                //ImGui::Selectable("...", false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick);
+            }
+            ImGui::EndTable();
+        }
+        ImGui::PopStyleVar();
+
+
+        ImGui::End();
     }
 
 }

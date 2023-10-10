@@ -146,6 +146,8 @@
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerStack.h" />
     <ClInclude Include="src\OS\WindowsWindow.h" />
+    <ClInclude Include="src\Renderer\OpenGL\BufferManager.h" />
+    <ClInclude Include="src\Renderer\Shader.h" />
     <ClInclude Include="src\UI\ImGui\UIlayer.h" />
     <ClInclude Include="src\UI\ImGui\Viewport.h" />
     <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
@@ -162,6 +164,8 @@
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\OS\WindowsWindow.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\BufferManager.cpp" />
+    <ClCompile Include="src\Renderer\Shader.cpp" />
     <ClCompile Include="src\UI\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\UI\ImGui\UIlayer.cpp" />
     <ClCompile Include="src\main.cpp" />

@@ -10,7 +10,7 @@ namespace Referencer {
 	class WindowsWindow : public Window
 	{
 	private:
-		virtual void init(std::string& title, unsigned int width, unsigned int height);// daj window properties prec z window
+		virtual void init(std::string& title, unsigned int width, unsigned int height);
 
 		GLFWwindow* m_window;
 		std::string m_title;
@@ -29,7 +29,7 @@ namespace Referencer {
 		inline unsigned int getWidth() const override { return m_width; }
 		inline unsigned int getHeight() const override { return m_height; }
 
-		// Window attributes
+		//...
 		inline void setEventCallback(const EventCallbackFn& callback) override { m_eventCallback = callback; }
 		void setVSync(bool enabled) override;
 		bool isVSync() const override;
