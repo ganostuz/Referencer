@@ -147,7 +147,11 @@
     <ClInclude Include="src\LayerStack.h" />
     <ClInclude Include="src\OS\WindowsWindow.h" />
     <ClInclude Include="src\Renderer\OpenGL\BufferManager.h" />
-    <ClInclude Include="src\Renderer\Shader.h" />
+    <ClInclude Include="src\Renderer\OpenGL\IndexBuffer.h" />
+    <ClInclude Include="src\Renderer\OpenGL\Shader.h" />
+    <ClInclude Include="src\Renderer\OpenGL\Texture.h" />
+    <ClInclude Include="src\Renderer\OpenGL\VertexArray.h" />
+    <ClInclude Include="src\Renderer\OpenGL\VertexBuffer.h" />
     <ClInclude Include="src\UI\ImGui\UIlayer.h" />
     <ClInclude Include="src\UI\ImGui\Viewport.h" />
     <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
@@ -165,7 +169,11 @@
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\OS\WindowsWindow.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\BufferManager.cpp" />
-    <ClCompile Include="src\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\IndexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\Shader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\Texture.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\VertexArray.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="src\UI\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\UI\ImGui\UIlayer.cpp" />
     <ClCompile Include="src\main.cpp" />

@@ -43,8 +43,12 @@
     <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
     <ClInclude Include="src\UI\ImGui\Viewport.h" />
     <ClInclude Include="src\UI\ImGui\Viewport3D.h" />
-    <ClInclude Include="src\Renderer\Shader.h" />
+    <ClInclude Include="src\Renderer\OpenGL\Shader.h" />
     <ClInclude Include="src\Renderer\OpenGL\BufferManager.h" />
+    <ClInclude Include="src\Renderer\OpenGL\VertexBuffer.h" />
+    <ClInclude Include="src\Renderer\OpenGL\IndexBuffer.h" />
+    <ClInclude Include="src\Renderer\OpenGL\VertexArray.h" />
+    <ClInclude Include="src\Renderer\OpenGL\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -63,7 +67,11 @@
     <ClCompile Include="src\rfpch.cpp" />
     <ClCompile Include="src\UI\ImGui\Viewport2D.cpp" />
     <ClCompile Include="src\UI\ImGui\Viewport3D.cpp" />
-    <ClCompile Include="src\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\Shader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\BufferManager.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\VertexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\IndexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\VertexArray.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\Texture.cpp" />
   </ItemGroup>
 </Project>

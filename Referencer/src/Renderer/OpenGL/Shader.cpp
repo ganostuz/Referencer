@@ -2,12 +2,19 @@
 #include "Shader.h"
 #include "glad\glad.h"
 
-#define RF_ASSERT(cond, ...) { if(!(cond)) { std::cout<<"Assertion Failed: "<< __VA_ARGS__ << std::endl; __debugbreak(); } }
+//#define RF_ASSERT(cond, ...) { if(!(cond)) { std::cout<<"Assertion Failed: "<< __VA_ARGS__ << std::endl; __debugbreak(); } }
+// 
 namespace Referencer {
 
-	Shader::Shader(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
+	Shader::Shader(const std::string& vetexFilePath, const std::string& fragmentFilePath)
 	{
 		
+		std::ifstream stream(vetexFilePath);
+		const std::string vertexShaderSource((std::istreambuf_iterator<char>(vetexFilePath)), std::istreambuf_iterator<char>());
+		
+		std::ifstream stream(fragmentFilePath);
+		const std::string fragmentShaderSource((std::istreambuf_iterator<char>(vetexFilePath)), std::istreambuf_iterator<char>());
+
 		const GLchar* source = vertexShaderSource.c_str();
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShader, 1, &source, NULL);
@@ -56,8 +63,7 @@ namespace Referencer {
 			return;
 		}
 
-		glDetachShader(m_programID, vertexShader);
-		glDetachShader(m_programID, fragmentShader);
+		glValidateProgram(m_programID); // idk if it needs to be used but documentation...
 
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
@@ -66,13 +72,47 @@ namespace Referencer {
 	{
 		glDeleteProgram(m_programID);
 	}
-	void Shader::bind()
+	
+	int Shader::getUniformLocation(const std::string& name) const
+	{
+		if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
+			return m_uniformLocationCache[name];
+
+		int location = glGetUniformLocation(m_programID, name.c_str());
+
+		if (location == -1)
+		{
+			std::cerr << "No active uniform variable with name " << name << std::endl;
+			return location;
+		}
+
+		m_uniformLocationCache[name] = location;
+		return location;
+	}
+
+	void Shader::bind() const
 	{
 		glUseProgram(m_programID);
 	}
-	void Shader::unBind()
+	void Shader::unBind() const
 	{
 		glUseProgram(0);
 	}
+
+	void Shader::setUniform1f(const std::string& name, float value)
+	{
+		glUniform1f(getUniformLocation(name), value);
+	}
+	void Shader::setUniform4f(const std::string& name, float f0, float f1, float f2, float f3)
+	{
+		glUniform4f(getUniformLocation(name), f0, f1, f2, f3);
+	}
+	/*
+	void Shader::setUniformMat4f(const std::string& name, const glm::mat4& matrix)
+	{
+		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+	}
+	*/
+
 }
 

@@ -27,7 +27,10 @@ namespace Referencer {
 
 		// Upload pixels into texture
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-		stbi_image_free(image_data);
+		if (image)
+		{
+			stbi_image_free(image_data);
+		}
 		// above to render
 	}
 
