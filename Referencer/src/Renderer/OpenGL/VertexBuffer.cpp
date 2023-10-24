@@ -3,7 +3,7 @@
 #include "glad\glad.h"
 
 namespace Referencer {
-    VertexBuffer::VertexBuffer(const void* data, GLuint size)
+    VertexBuffer::VertexBuffer(const void* data, unsigned int size)
         : m_stride(0)
     {
         glGenBuffers(1, &m_bufferID);
@@ -26,34 +26,24 @@ namespace Referencer {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void VertexBuffer::addFloat(GLuint count)
+    void VertexBuffer::addFloat(unsigned int count)
     {
         push(GL_FLOAT, count, GL_FALSE);
     }
 
-    void VertexBuffer::addUnsignedInt(GLuint count)
+    void VertexBuffer::addUnsignedInt(unsigned int count)
     {
         push(GL_UNSIGNED_INT, count, GL_FALSE);
     }
 
-    void VertexBuffer::addUnsignedByte(GLuint count)
+    void VertexBuffer::addUnsignedByte(unsigned int count)
     {
         push(GL_UNSIGNED_BYTE, count, GL_TRUE);
     }
 
-    inline const std::vector<VertexBufferElement> VertexBuffer::getElements() const
-    {
-        return m_elements;
-    }
-
-    inline GLuint VertexBuffer::getStride() const
-    {
-        return m_stride;
-    }
-
     //private funcs
 
-    void VertexBuffer::push(GLuint type, GLuint count, GLuint normalized)
+    void VertexBuffer::push(unsigned int type, unsigned int count, unsigned int normalized)
     {
         struct VertexBufferElement vbe = { type, count, normalized };
         m_elements.push_back(vbe);

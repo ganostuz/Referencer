@@ -147,6 +147,7 @@
     <ClInclude Include="src\LayerStack.h" />
     <ClInclude Include="src\OS\WindowsWindow.h" />
     <ClInclude Include="src\Renderer\OpenGL\BufferManager.h" />
+    <ClInclude Include="src\Renderer\OpenGL\FrameBuffer.h" />
     <ClInclude Include="src\Renderer\OpenGL\IndexBuffer.h" />
     <ClInclude Include="src\Renderer\OpenGL\Shader.h" />
     <ClInclude Include="src\Renderer\OpenGL\Texture.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\OS\WindowsWindow.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\BufferManager.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Shader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Texture.cpp" />
@@ -193,6 +195,10 @@
     <ProjectReference Include="vendor\imGui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Shader.fragment" />
+    <None Include="resources\Shader.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,22 +3,22 @@
 #include "glad\glad.h"
 
 namespace Referencer {
-    IndexBuffer::IndexBuffer(const GLuint* indices, GLuint count)
+    IndexBuffer::IndexBuffer(const unsigned int* indices, unsigned int count)
         : m_count(count)
     {
         glGenBuffers(1, &m_bufferID);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(GLuint), indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
     }
 
     IndexBuffer::~IndexBuffer()
     {
-        glDeleteBuffers(1, &m_RendererID);
+        glDeleteBuffers(1, &m_bufferID);
     }
 
     void IndexBuffer::bind() const
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
     }
 
     void IndexBuffer::unBind() const

@@ -5,11 +5,11 @@ namespace Referencer {
 	class Shader
 	{
 	private:
-		GLuint m_programID = 0;
+		unsigned int m_programID = 0;
 		std::string m_vetexFilePath, m_fragmentFilePath;
 		std::unordered_map<std::string, int> m_uniformLocationCache;
 
-        int getUniformLocation(const std::string& name) const;
+        int getUniformLocation(const std::string& name); // len taka sranda ak das const bude hadzat error 
 	public:
         Shader(const std::string& vetexFilePath, const std::string& fragmentFilePath);
         ~Shader();

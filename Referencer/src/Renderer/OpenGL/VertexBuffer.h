@@ -1,11 +1,12 @@
 #pragma once
+#include "glad\glad.h"
 namespace Referencer {
 
     struct VertexBufferElement
     {
-        GLuint type;
-        GLuint count;
-        GLuint normalized;
+        unsigned int type;
+        unsigned int count;
+        unsigned int normalized;
 
         static unsigned int getSizeOfType(unsigned int type)
         {
@@ -22,24 +23,24 @@ namespace Referencer {
     class VertexBuffer
     {
     private:
-        GLuint m_bufferID;
-        GLuint m_stride;
+        unsigned int m_bufferID;
+        unsigned int m_stride;
         std::vector<VertexBufferElement> m_elements;
 
-        void push(GLuint type, GLuint count, GLuint normalized);
+        void push(unsigned int type, unsigned int count, unsigned int normalized);
     
     public:
-        VertexBuffer(const void* data, GLuint size);
+        VertexBuffer(const void* data, unsigned int size);
         ~VertexBuffer();
     
         void bind() const;
         void unBind() const;
 
-        void addFloat(GLuint count);
-        void addUnsignedInt(GLuint count);
-        void addUnsignedByte(GLuint count);
+        void addFloat(unsigned int count);
+        void addUnsignedInt(unsigned int count);
+        void addUnsignedByte(unsigned int count);
 
-        inline const std::vector<VertexBufferElement> getElements() const;
-        inline GLuint getStride() const;
+        inline const std::vector<VertexBufferElement> getElements() const { return m_elements; };
+        inline unsigned int getStride() const { return m_stride; };
     };
 }

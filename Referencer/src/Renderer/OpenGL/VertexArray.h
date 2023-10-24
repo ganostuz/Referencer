@@ -1,9 +1,10 @@
 #pragma once
+#include "VertexBuffer.h"
 namespace Referencer {
     class VertexArray
     {
     private:
-        GLuint m_bufferID;
+        unsigned int m_bufferID;
 
     public:
         VertexArray();

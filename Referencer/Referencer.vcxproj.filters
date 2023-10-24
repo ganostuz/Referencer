@@ -49,6 +49,7 @@
     <ClInclude Include="src\Renderer\OpenGL\IndexBuffer.h" />
     <ClInclude Include="src\Renderer\OpenGL\VertexArray.h" />
     <ClInclude Include="src\Renderer\OpenGL\Texture.h" />
+    <ClInclude Include="src\Renderer\OpenGL\FrameBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -73,5 +74,10 @@
     <ClCompile Include="src\Renderer\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\VertexArray.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Texture.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\FrameBuffer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Shader.vertex" />
+    <None Include="resources\Shader.fragment" />
   </ItemGroup>
 </Project>

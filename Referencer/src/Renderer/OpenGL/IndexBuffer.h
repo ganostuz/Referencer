@@ -3,16 +3,16 @@ namespace Referencer {
     class IndexBuffer
     {
     private:
-        GLuint m_bufferID;
-        GLuint m_count;
+        unsigned int m_bufferID;
+        unsigned int m_count;
 
     public:
-        IndexBuffer(const GLuint* indices, GLuint count);
+        IndexBuffer(const unsigned int* indices, unsigned int count);
         ~IndexBuffer();
 
         void bind() const;
         void unBind() const;
 
-        inline unsigned int GetCount() const { return m_Count; }
+        inline unsigned int GetCount() const { return m_count; }
     };
 }

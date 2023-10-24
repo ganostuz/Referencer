@@ -1,20 +1,21 @@
 #include "rfpch.h"
+#include <fstream>
 #include "Shader.h"
 #include "glad\glad.h"
 
-//#define RF_ASSERT(cond, ...) { if(!(cond)) { std::cout<<"Assertion Failed: "<< __VA_ARGS__ << std::endl; __debugbreak(); } }
+//#define ASSERT(cond, ...) { if(!(cond)) { std::cout<<"Assertion Failed: "<< __VA_ARGS__ << std::endl; __debugbreak(); } }
 // 
 namespace Referencer {
 
 	Shader::Shader(const std::string& vetexFilePath, const std::string& fragmentFilePath)
 	{
 		
-		std::ifstream stream(vetexFilePath);
-		const std::string vertexShaderSource((std::istreambuf_iterator<char>(vetexFilePath)), std::istreambuf_iterator<char>());
+		std::ifstream vstream(vetexFilePath);
+		const std::string vertexShaderSource((std::istreambuf_iterator<char>(vstream)), std::istreambuf_iterator<char>());
 		
-		std::ifstream stream(fragmentFilePath);
-		const std::string fragmentShaderSource((std::istreambuf_iterator<char>(vetexFilePath)), std::istreambuf_iterator<char>());
-
+		std::ifstream fstream(fragmentFilePath);
+		const std::string fragmentShaderSource((std::istreambuf_iterator<char>(fstream)), std::istreambuf_iterator<char>());
+		
 		const GLchar* source = vertexShaderSource.c_str();
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShader, 1, &source, NULL);
@@ -73,7 +74,7 @@ namespace Referencer {
 		glDeleteProgram(m_programID);
 	}
 	
-	int Shader::getUniformLocation(const std::string& name) const
+	int Shader::getUniformLocation(const std::string& name)
 	{
 		if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
 			return m_uniformLocationCache[name];
