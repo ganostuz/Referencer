@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ExampleLayer.h" />
     <ClInclude Include="src\KeyCodes.h" />
     <ClInclude Include="src\Layer.h" />
@@ -24,6 +25,15 @@
       <Filter>OS</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\ImGui\UIlayer.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ImGui\Viewport.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ImGui\Viewport2D.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ImGui\Viewport3D.h">
       <Filter>UI\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="src\Window.h" />
@@ -40,10 +50,7 @@
       <Filter>events</Filter>
     </ClInclude>
     <ClInclude Include="src\rfpch.h" />
-    <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
-    <ClInclude Include="src\UI\ImGui\Viewport.h" />
-    <ClInclude Include="src\UI\ImGui\Viewport3D.h" />
-    <ClInclude Include="src\Debug.h" />
+    <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -58,15 +65,13 @@
     <ClCompile Include="src\UI\ImGui\UIlayer.cpp">
       <Filter>UI\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\ImGui\Viewport2D.cpp">
+      <Filter>UI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\ImGui\Viewport3D.cpp">
+      <Filter>UI\ImGui</Filter>
+    </ClCompile>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\rfpch.cpp" />
-    <ClCompile Include="src\UI\ImGui\Viewport2D.cpp" />
-    <ClCompile Include="src\UI\ImGui\Viewport3D.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resources\Shader.vertex" />
-    <None Include="resources\Shader.fragment" />
-    <None Include="resources\FrameBufShader.fragment" />
-    <None Include="resources\FrameBufShader.vertex" />
   </ItemGroup>
 </Project>

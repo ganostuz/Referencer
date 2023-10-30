@@ -16,12 +16,12 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
 IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
 IncludeDir["ImGui"] = "Referencer/vendor/imGui"
-IncludeDir["assimp"] = "Referencer/vendor/assimp/assimp/include/assimpp"
+IncludeDir["assimp"] = "Referencer/vendor/assimp/assimp/include"
 
 include "Referencer/vendor/GLFW"
 include "Referencer/vendor/Glad"
 include "Referencer/vendor/imGui"
-include "Referencer/vendor/assimp"
+include "Referencer/vendor/assimp/assimp"
 
 project "Referencer"
 	location "Referencer"
@@ -45,7 +45,8 @@ project "Referencer"
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.assimp}"
 	}
 
 	links 
@@ -53,7 +54,7 @@ project "Referencer"
 		"GLFW",
 		"Glad",
 		"ImGui",
-		"opengl32.lib"
+		"opengl32.lib",
 		"assimp"
 	}
 
