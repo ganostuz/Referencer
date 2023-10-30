@@ -16,10 +16,12 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
 IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
 IncludeDir["ImGui"] = "Referencer/vendor/imGui"
+IncludeDir["assimp"] = "Referencer/vendor/assimp/assimp/include/assimpp"
 
 include "Referencer/vendor/GLFW"
 include "Referencer/vendor/Glad"
 include "Referencer/vendor/imGui"
+include "Referencer/vendor/assimp"
 
 project "Referencer"
 	location "Referencer"
@@ -52,6 +54,7 @@ project "Referencer"
 		"Glad",
 		"ImGui",
 		"opengl32.lib"
+		"assimp"
 	}
 
 	filter "system:windows"

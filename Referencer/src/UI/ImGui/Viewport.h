@@ -6,7 +6,7 @@ namespace Referencer {
 	class Viewport
 	{
 	private:
-		bool m_isOpen, m_running, m_selected;
+		bool m_isOpen, m_running, m_selected; // proste na komunikaciu s layout managerom
 		std::string m_name;
 	public:
 		 Viewport(std::string name, bool isOpen)

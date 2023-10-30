@@ -1,6 +1,5 @@
 #include "rfpch.h"
 #include "WindowsWindow.h"
-
 #include "events\KeyEvent.h"
 #include "events\ApplicationEvents.h"
 #include "events\MouseEvent.h"
@@ -157,6 +156,8 @@ namespace Referencer {
 
 	void WindowsWindow::onUpdate()
 	{
+		
+
 		glfwPollEvents();
 		glfwSwapBuffers(m_window);
 	}

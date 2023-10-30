@@ -1,5 +1,4 @@
 #include "rfpch.h"
-// nema to byt tu platform specific
 #include "UIlayer.h"
 #include <imgui.h>
 #include "events\KeyEvent.h"
@@ -9,8 +8,7 @@
 
 #include "GLFW\glfw3.h"
 #define GLFW_EXPOSE_NATIVE_WIN32 
-#include "GLFW/glfw3native.h"
-#include <commdlg.h>
+#include "GLFW\glfw3native.h"
 
 
 
@@ -144,7 +142,7 @@ namespace Referencer {
     void UIlayer::End()
     {
         ImGuiIO& io = ImGui::GetIO();
-        Application& app = Application::getApplication();
+        Application& app = Application::getApplication(); // not needed anymore... maybe
         io.DisplaySize = ImVec2((float)app.getWindow().getWidth(), (float)app.getWindow().getHeight());
 
         // Rendering
@@ -367,8 +365,10 @@ namespace Referencer {
         }
         ImGui::PopStyleVar();
 
-
         ImGui::End();
+        
+
+
     }
 
 }

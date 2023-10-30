@@ -141,18 +141,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ExampleLayer.h" />
     <ClInclude Include="src\KeyCodes.h" />
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerStack.h" />
     <ClInclude Include="src\OS\WindowsWindow.h" />
-    <ClInclude Include="src\Renderer\OpenGL\BufferManager.h" />
-    <ClInclude Include="src\Renderer\OpenGL\FrameBuffer.h" />
-    <ClInclude Include="src\Renderer\OpenGL\IndexBuffer.h" />
-    <ClInclude Include="src\Renderer\OpenGL\Shader.h" />
-    <ClInclude Include="src\Renderer\OpenGL\Texture.h" />
-    <ClInclude Include="src\Renderer\OpenGL\VertexArray.h" />
-    <ClInclude Include="src\Renderer\OpenGL\VertexBuffer.h" />
     <ClInclude Include="src\UI\ImGui\UIlayer.h" />
     <ClInclude Include="src\UI\ImGui\Viewport.h" />
     <ClInclude Include="src\UI\ImGui\Viewport2D.h" />
@@ -169,13 +163,6 @@
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\OS\WindowsWindow.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\BufferManager.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\FrameBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\IndexBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\Shader.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\Texture.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\VertexArray.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="src\UI\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\UI\ImGui\UIlayer.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -197,6 +184,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\FrameBufShader.fragment" />
+    <None Include="resources\FrameBufShader.vertex" />
     <None Include="resources\Shader.fragment" />
     <None Include="resources\Shader.vertex" />
   </ItemGroup>

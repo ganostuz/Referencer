@@ -45,11 +45,12 @@ namespace Referencer {
 	}
 	void Application::run()
 	{
+
 		while (m_running)
 		{
-			glClearColor(.2f, .2f, .2f, 1.0f);
+
+			glClearColor(.2f,.2f,.2f,1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
-            ;
 
 			for (Layer* layer : m_layerStack)
 				layer->onUpdate();

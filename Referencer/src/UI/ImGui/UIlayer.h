@@ -18,8 +18,8 @@ namespace Referencer {
 	private:
 		std::vector<Viewport*> m_viewports;
 		//std::vector<bool> m_selected; // presunie sa do viewportov
-		bool m_showMenu;
-		// meshes and camera rotation matrix
+		bool m_showMenu; 
+// meshes and camera rotation matrix
 		
 
 	public:
