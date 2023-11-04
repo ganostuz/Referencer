@@ -4,6 +4,9 @@
     <Filter Include="OS">
       <UniqueIdentifier>{C7745900-B300-880B-1CAF-880B085A880B}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{7CCE658F-689B-C09A-91B4-AE427DE0F528}</UniqueIdentifier>
+    </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
     </Filter>
@@ -23,6 +26,9 @@
     <ClInclude Include="src\LayerStack.h" />
     <ClInclude Include="src\OS\WindowsWindow.h">
       <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\Shader.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\ImGui\UIlayer.h">
       <Filter>UI\ImGui</Filter>
@@ -51,6 +57,7 @@
     </ClInclude>
     <ClInclude Include="src\rfpch.h" />
     <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\Renderer\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -58,6 +65,9 @@
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\OS\WindowsWindow.cpp">
       <Filter>OS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Shader.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\ImGui\ImGuiBuild.cpp">
       <Filter>UI\ImGui</Filter>
