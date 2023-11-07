@@ -16,7 +16,9 @@
 #include <Renderer/Camera.h>
 #include <Renderer/Model.h>
 #include "events\KeyEvent.h"
+#include "events\MouseEvent.h"
 #include "events\Event.h"
+#include "stb_image.h"
 
 namespace Referencer {
 	class TestLayer : public Layer
@@ -26,8 +28,10 @@ namespace Referencer {
 		Model ourModel;
 		Camera ourCamera;
 		Shader ourShader;
+		bool firstMouse = true;
+		float lastX, lastY;
 
-		bool handleInput(KeyEvent& e)
+		bool handleKeyboard(KeyEvent& e)
 		{
 			float deltaTime = 0.01f;
 			if (e.getKeyCode() == GLFW_KEY_W)
@@ -41,13 +45,38 @@ namespace Referencer {
 		//mozme dat ze sme to handlovali...
 			return true;
 		}
+		bool handleScroll(MouseScrolledEvent& e)
+		{
+			ourCamera.ProcessMouseScroll(e.getOffsetY() * 0.1);
+
+			//mozme dat ze sme to handlovali...
+			return true;
+		}
+		bool handleMouse(MouseMovedEvent& e)
+		{
+			if (firstMouse)
+			{
+				lastX = e.getX();
+				lastY = e.getY();
+				firstMouse = false;
+			}
+			float xoffset = e.getX() - lastX;
+			float yoffset = lastY - e.getY();
+			lastX = e.getX();
+			lastY = e.getY();
+			ourCamera.ProcessMouseMovement(xoffset, yoffset);
+
+			//mozme dat ze sme to handlovali...
+			return true;
+		}
 	public:
 		TestLayer(const std::string& name = "Layer")
-			: Layer(name), ourShader("modelLoadingShader.vertex", "modelLoadingShader.fragment"), ourCamera(glm::vec3(0.0f, 0.0f, 3.0f)), ourModel("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj") {}
+			: Layer(name), ourShader("resources/modelShader.vertex", "resources/modelShader.fragment"), ourCamera(glm::vec3(0.0f, 0.0f, 3.0f)), ourModel("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj"){}
 		~TestLayer(){}
 
 		void onAttach()
 		{
+			
 			const unsigned int SCR_WIDTH = 800;
 			const unsigned int SCR_HEIGHT = 600;
 			glEnable(GL_DEPTH_TEST);
@@ -84,7 +113,9 @@ namespace Referencer {
 		{
 			float deltaTime = 0.02f;
 			EventDispatcher dispatcher(event);
-			dispatcher.dispatch<KeyTypedEvent>(std::bind(&TestLayer::handleInput, this, std::placeholders::_1));
+			dispatcher.dispatch<KeyPressedEvent>(std::bind(&TestLayer::handleKeyboard, this, std::placeholders::_1));
+			dispatcher.dispatch<MouseScrolledEvent>(std::bind(&TestLayer::handleScroll, this, std::placeholders::_1));
+			dispatcher.dispatch<MouseMovedEvent>(std::bind(&TestLayer::handleMouse, this, std::placeholders::_1));
 		
 		}
 	};

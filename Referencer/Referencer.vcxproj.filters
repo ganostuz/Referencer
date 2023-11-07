@@ -88,7 +88,7 @@
     <ClCompile Include="src\rfpch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\modelLoadingShader.fragment" />
-    <None Include="resources\modelLoadingShader.vertex" />
+    <None Include="resources\modelShader.fragment" />
+    <None Include="resources\modelShader.vertex" />
   </ItemGroup>
 </Project>

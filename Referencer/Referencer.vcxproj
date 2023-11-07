@@ -197,8 +197,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\modelLoadingShader.fragment" />
-    <None Include="resources\modelLoadingShader.vertex" />
+    <None Include="resources\modelShader.fragment" />
+    <None Include="resources\modelShader.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

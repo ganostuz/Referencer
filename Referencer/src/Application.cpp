@@ -7,6 +7,7 @@
 #include "glm/common.hpp"
 #include "assimp\BaseImporter.h"
 #include "TestLayer.h"
+#include "stb_image.h"
 
 namespace Referencer {
 
@@ -17,6 +18,9 @@ namespace Referencer {
 		m_running = true;
 		m_window = std::unique_ptr<Window>(Window::create());
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
+
+		glEnable(GL_DEPTH_TEST);
+		stbi_set_flip_vertically_on_load(true);
 
 		pushLayer(new TestLayer());
 		pushLayer(new UIlayer());
