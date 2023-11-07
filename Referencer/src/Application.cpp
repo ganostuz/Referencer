@@ -1,10 +1,12 @@
 #include "rfpch.h"
+
 #include "Application.h"
 #include "UI\ImGui\UIlayer.h"
 #include "GLFW\glfw3.h"
 #include "glad\glad.h"
 #include "glm/common.hpp"
 #include "assimp\BaseImporter.h"
+#include "TestLayer.h"
 
 namespace Referencer {
 
@@ -28,11 +30,11 @@ namespace Referencer {
 		EventDispatcher dispatcher(e);
 		dispatcher.dispatch<WindowCloseEvent>(std::bind(&Application::onWindowClose, this, std::placeholders::_1));
 		dispatcher.dispatch<WindowResizedEvent>([](WindowResizedEvent& e) -> bool
-			{
-				glViewport(0, 0, e.getWidth(), e.getHeight());
+		{
+			glViewport(0, 0, e.getWidth(), e.getHeight());
 
-				return false;// for now
-			}); // window resize, moved and closed events will be handled primarly by application and handled set to false primarly beacause ImGui needs to process it
+			return false;// for now
+		}); // window resize, moved and closed events will be handled primarly by application and handled set to false primarly beacause ImGui needs to process it
 
 		for (auto i = m_layerStack.begin(); i != m_layerStack.end(); i++)
 		{

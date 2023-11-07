@@ -10,7 +10,12 @@ namespace Referencer {
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer();
 
-		virtual void onAttach() {}
+		virtual void onAttach() 
+		{
+		
+		
+		
+		}
 		virtual void onDetach() {}
 		virtual void onUpdate() {}
 		virtual void onEvent(Event& event) {}

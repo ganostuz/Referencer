@@ -58,6 +58,9 @@
     <ClInclude Include="src\rfpch.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Renderer\Mesh.h" />
+    <ClInclude Include="src\Renderer\Model.h" />
+    <ClInclude Include="src\Renderer\Camera.h" />
+    <ClInclude Include="src\TestLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -83,5 +86,12 @@
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\rfpch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\modelLoadingShader.fragment" />
+    <None Include="resources\modelLoadingShader.vertex" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\guzst\Downloads\FJ3289.obj" />
   </ItemGroup>
 </Project>

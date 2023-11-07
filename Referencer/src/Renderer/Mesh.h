@@ -47,10 +47,8 @@ namespace Referencer {
 
         // constructor
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
+            :vertices(vertices), indices(indices), textures(textures)
         {
-            this->vertices = vertices;
-            this->indices = indices;
-            this->textures = textures;
 
             // now that we have all the required data, set the vertex buffers and its attribute pointers.
             setupMesh();
@@ -80,7 +78,7 @@ namespace Referencer {
                     number = std::to_string(heightNr++); // transfer unsigned int to string
 
                 // now set the sampler to the correct texture unit
-                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+                glUniform1i(glGetUniformLocation(shader.getID(), (name + number).c_str()), i);
                 // and finally bind the texture
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
             }

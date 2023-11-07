@@ -1,6 +1,7 @@
 #include "rfpch.h"
 #include <fstream>
 #include "Shader.h"
+#include <glm\common.hpp>
 
 //#define ASSERT(cond, ...) { if(!(cond)) { std::cout<<"Assertion Failed: "<< __VA_ARGS__ << std::endl; __debugbreak(); } }
 // 
@@ -107,11 +108,9 @@ namespace Referencer {
 	{
 		glUniform4f(getUniformLocation(name), f0, f1, f2, f3);
 	}
-	/*
-	void Shader::setUniformMat4f(const std::string& name, const glm::mat4& matrix)
+	void Shader::setMat4(const std::string& name, const glm::mat4& mat)
 	{
-		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 	}
-	*/
 
 }
