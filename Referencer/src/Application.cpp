@@ -18,6 +18,7 @@ namespace Referencer {
 		m_window = std::unique_ptr<Window>(Window::create());
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
 
+		pushLayer(new TestLayer());
 		pushLayer(new UIlayer());
 
 	}
@@ -51,8 +52,8 @@ namespace Referencer {
 		while (m_running)
 		{
 
-			glClearColor(.2f,.2f,.2f,1.f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			//glClearColor(.2f,.2f,.2f,1.f);
+			//glClear(GL_COLOR_BUFFER_BIT);
 
 			for (Layer* layer : m_layerStack)
 				layer->onUpdate();

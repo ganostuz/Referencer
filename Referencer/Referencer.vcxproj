@@ -200,9 +200,6 @@
     <None Include="resources\modelLoadingShader.fragment" />
     <None Include="resources\modelLoadingShader.vertex" />
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="C:\Users\guzst\Downloads\FJ3289.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
