@@ -41,10 +41,33 @@ namespace Referencer {
             glm::vec3 viewDirection = glm::normalize(m_lookAt - m_eye);
             m_viewMatrix = glm::lookAt(m_eye + viewDirection * m_zoom, m_lookAt, m_upVector);
         }
-        void Rotate(glm::vec2 prevPos, glm::vec2 currPos)
+        void Rotate(glm::vec2 prevPos, glm::vec2 currPos, glm::vec2 screenSize)
         {
-            float xAngle = (prevPos.x - currPos.x) * (2 * glm::pi<float>() / 800.0f);
-            float yAngle = (prevPos.y - currPos.y) * (2* glm::pi<float>() / 600.0f);
+            float xAngle = (prevPos.x - currPos.x) * (2 * glm::pi<float>() / screenSize.x);
+            float yAngle = (prevPos.y - currPos.y) * (2* glm::pi<float>() / screenSize.y);
+
+            float cosAngle = glm::dot(GetViewDir(), m_upVector);
+            if (cosAngle * glm::sign(yAngle) > 0.99f)
+                yAngle = 0;
+
+            glm::mat4x4 rotationMatrixX(1.0f);
+            rotationMatrixX = glm::rotate(rotationMatrixX, xAngle, m_upVector);
+            m_eye = glm::vec3(rotationMatrixX * glm::vec4(m_eye - m_lookAt, 1.0f)) + m_lookAt;
+
+
+            // step 3: Rotate the camera around the pivot point on the second axis.
+            glm::mat4x4 rotationMatrixY(1.0f);
+            rotationMatrixY = glm::rotate(rotationMatrixY, yAngle, GetRightVector());
+
+            glm::vec3 finalPosition = glm::vec3(rotationMatrixY * glm::vec4(m_eye - m_lookAt, 1.0f)) + m_lookAt;
+
+            // Update the camera view (we keep the same lookat and the same up vector)
+            SetCameraView(finalPosition, GetLookAt(), m_upVector);
+        }
+        void Rotate(glm::vec2 posDelta,glm::vec2 screenSize)
+        {
+            float xAngle = posDelta.x * (2 * glm::pi<float>() / screenSize.x);
+            float yAngle = posDelta.y * (2 * glm::pi<float>() / screenSize.y);
 
             float cosAngle = glm::dot(GetViewDir(), m_upVector);
             if (cosAngle * glm::sign(yAngle) > 0.99f)

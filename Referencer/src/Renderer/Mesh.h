@@ -9,9 +9,6 @@
 
 namespace Referencer {
 
-    #ifndef MESH_H
-    #define MESH_H
-
     #define MAX_BONE_INFLUENCE 4
 
     struct Vertex {
@@ -141,7 +138,4 @@ namespace Referencer {
             glBindVertexArray(0);
         }
     };
-    #endif
-
-
 }

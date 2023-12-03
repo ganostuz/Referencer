@@ -147,7 +147,6 @@
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerStack.h" />
     <ClInclude Include="src\OS\WindowsWindow.h" />
-    <ClInclude Include="src\Renderer\arcball_camera.h" />
     <ClInclude Include="src\Renderer\Mesh.h" />
     <ClInclude Include="src\Renderer\Model.h" />
     <ClInclude Include="src\Renderer\MyCamera.h" />
@@ -170,7 +169,6 @@
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\LayerStack.cpp" />
     <ClCompile Include="src\OS\WindowsWindow.cpp" />
-    <ClCompile Include="src\Renderer\arcball_camera.cpp" />
     <ClCompile Include="src\Renderer\Shader.cpp" />
     <ClCompile Include="src\UI\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\UI\ImGui\UIlayer.cpp" />

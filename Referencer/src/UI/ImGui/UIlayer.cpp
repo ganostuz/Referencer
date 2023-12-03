@@ -17,7 +17,7 @@
 namespace Referencer {
 
     UIlayer::UIlayer()
-        : Layer("ImGui layer"), m_showMenu(true)
+        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f)
     {
     }
     
@@ -109,8 +109,49 @@ namespace Referencer {
         // than renders compoments render();
         // in which helper funcition renderViewports, renderMenu, renderViewportStack, etc
         Begin(); // begins new frame
+        if (ImGui::IsMouseDragging(0) && ImGui::IsKeyDown(ImGuiKey_LeftShift))
+        {
+            ImVec2 delta = ImGui::GetMouseDragDelta(0);
 
-        UpdateViewports(); // deletes viewports with delete flag
+            m_instantOffsetX = delta.x - m_offsetX;
+            m_instantOffsetY = delta.y - m_offsetY;
+
+            m_offsetX = delta.x;
+            m_offsetY = delta.y;
+
+        }
+        if (ImGui::IsMouseReleased(0))
+        {
+            m_offsetX = 0.0f;
+            m_offsetY = 0.0f;
+
+            m_instantOffsetX = 0.0f;
+            m_instantOffsetY = 0.0f;
+        }
+
+        ImGuiIO io = ImGui::GetIO();
+
+        if (io.MouseWheel != 0.0f) 
+        {
+            m_instantZoom = io.MouseWheel;
+            m_zoom += io.MouseWheel;
+            std::cout << m_zoom << std::endl;
+        }
+        else
+        {
+            m_instantZoom = 0.0f;
+        }
+        /*
+            halfX = SCREEN_WIDTH / 2
+            halfY = SCREEN_HEIGHT / 2
+                deltaX = xPos - halfX;
+            deltaY = yPos - halfY;
+            x = halfX + deltaX * zoom + xOff;
+            y = halfY + deltaY * zoom + yOff;
+        */
+
+        // pass into it correct/instant offset
+        UpdateViewports(); // deletes viewports with delete flag + updates them based on pan, zoom
 
         Render(); // renders components
         
@@ -127,7 +168,8 @@ namespace Referencer {
     }
 
     // main private funcs
-
+    
+    // begins new frame
     void UIlayer::Begin()
     {
         static bool idk = true;
@@ -139,6 +181,7 @@ namespace Referencer {
        
     }
 
+    // renders imgui
     void UIlayer::End()
     {
         ImGuiIO& io = ImGui::GetIO();
@@ -157,7 +200,7 @@ namespace Referencer {
             glfwMakeContextCurrent(backup_current_context);
         }
     }
-
+    // renders components
     void UIlayer::Render()
     {
         ImGui::Begin("layers");
@@ -173,6 +216,7 @@ namespace Referencer {
         ImGui::End();
     }
 
+    // deletes viewports with delete flag + render 2d,3d viewports that are not hidden
     void UIlayer::UpdateViewports()
     {
         for (auto it = m_viewports.begin(); it != m_viewports.end(); it++)
@@ -186,12 +230,20 @@ namespace Referencer {
                 break;
             }
             else if ((*it)->getIsOpened())
-                (*it)->onUpdate();
+                (*it)->onUpdate(m_instantOffsetX, m_instantOffsetY, m_instantZoom, m_zoom); // tu treba passnut offsety a zoom
+            /*
+            halfX = SCREEN_WIDTH / 2
+            halfY = SCREEN_HEIGHT / 2
+                deltaX = xPos - halfX;
+            deltaY = yPos - halfY;
+            x = halfX + deltaX * zoom + xOff;
+            y = halfY + deltaY * zoom + yOff;
+            */
         }
     }
 
     // seperation of in class funcs
-
+    // makes native file dialog for saving file
     std::string UIlayer::saveFileDialog(const char* filter)
     {
         OPENFILENAMEA ofn;
@@ -213,6 +265,7 @@ namespace Referencer {
         return std::string();
     }
 
+    //makes native file dialog for loading file
     std::string UIlayer::loadFileDialog(const char* filter)
     {
         OPENFILENAMEA ofn;
@@ -328,10 +381,8 @@ namespace Referencer {
         for (int i = 0; i < m_viewports.size(); i++)
         {
             ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
-            //ImGui::Checkbox(m_viewports[i]->getName().c_str(), &m_viewports[i]->getIsOpened());
-            //std::cout << m_viewports[i]->getName().c_str() << m_viewports[i]->getIsOpened() << std::endl;
         }
-        //ImGui::EndMenu();
+
         ImGuiStyle& style = ImGui::GetStyle();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0,0 });
@@ -349,7 +400,7 @@ namespace Referencer {
                 ImGui::TableSetColumnIndex(0);
                 ImGui::SetNextItemAllowOverlap();
                 ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
-                //ImGui::Selectable(m_viewports[i]->getName().c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick);
+
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x * 2, style.ItemSpacing.y)); // Fix
 
                 ImGui::SameLine(ImGui::GetWindowWidth() - 20.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
@@ -359,7 +410,6 @@ namespace Referencer {
                 ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
-                //ImGui::Selectable("...", false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick);
             }
             ImGui::EndTable();
         }

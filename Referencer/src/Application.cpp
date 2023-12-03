@@ -22,7 +22,7 @@ namespace Referencer {
 		glEnable(GL_DEPTH_TEST);
 		stbi_set_flip_vertically_on_load(true);
 
-		pushLayer(new TestLayer());
+		//pushLayer(new TestLayer());
 		pushLayer(new UIlayer());
 
 	}
@@ -55,7 +55,6 @@ namespace Referencer {
 
 		while (m_running)
 		{
-
 			glClearColor(.2f,.2f,.2f,1.f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

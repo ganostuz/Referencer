@@ -12,7 +12,7 @@ namespace Referencer {
 		 Viewport(std::string name, bool isOpen)
 			 :m_isOpen(isOpen), m_name(name), m_running(true), m_selected(false) {}
 
-		virtual void onUpdate() = 0;
+		virtual void onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom) = 0;
 		virtual void onEvent(Event& e) = 0;
 
 		inline std::string& getName() { return m_name; }

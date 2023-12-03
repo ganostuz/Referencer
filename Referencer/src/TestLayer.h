@@ -33,47 +33,26 @@ namespace Referencer {
 
 	private:
 		Model ourModel;
-		//Camera ourCamera;
 		Camera ourCamera;
 		Shader ourShader;
 		bool firstMouse = true;
 		bool captureMouse = false, captureWheelClick = false;
 		float lastX, lastY;
 
-		bool handleKeyboard(KeyEvent& e)
-		{
-			//float deltaTime = 0.01f;
-			//if (e.getKeyCode() == GLFW_KEY_W)
-			//	ourCamera.ProcessKeyboard(FORWARD, deltaTime);
-			//if (e.getKeyCode() == GLFW_KEY_S)
-			//	ourCamera.ProcessKeyboard(BACKWARD, deltaTime);
-			//if (e.getKeyCode() == GLFW_KEY_A)
-			//	ourCamera.ProcessKeyboard(LEFT, deltaTime);
-			//if (e.getKeyCode() == GLFW_KEY_D)
-			//	ourCamera.ProcessKeyboard(RIGHT, deltaTime);
-		//mozme dat ze sme to handlovali...
-			return true;
-		}
 		bool handleScroll(MouseScrolledEvent& e)
 		{
-			//ourCamera.ProcessMouseScroll(e.getOffsetY() * 0.1);
 			ourCamera.Zoom(e.getOffsetY());
 
-			//mozme dat ze sme to handlovali...
 			return true;
 		}
 		bool handleMouse(MouseMovedEvent& e)
 		{
-			if (captureMouse || captureWheelClick) 
+			if (captureMouse) 
 			{
 				if (!firstMouse)
 				{
-					if (captureMouse)
-						ourCamera.Rotate(glm::vec2(lastX, lastY), glm::vec2(e.getX(), e.getY()));
-					if (captureWheelClick)
-						//ourCamera.pan(transform_mouse(glm::vec2(lastX, lastY)) - transform_mouse(glm::vec2(e.getX(), e.getY())));
-					lastX = e.getX();
-					lastY = e.getY();
+					ourCamera.Rotate(glm::vec2(lastX, lastY), glm::vec2(e.getX(), e.getY()), glm::vec2(600.0f, 800.0f));
+					
 				}
 				lastX = e.getX();
 				lastY = e.getY();
@@ -89,8 +68,6 @@ namespace Referencer {
 		{
 			if (e.getMouseButton() == GLFW_MOUSE_BUTTON_1)
 				captureMouse = true; 
-			else if (e.getMouseButton() == GLFW_MOUSE_BUTTON_3)
-				captureWheelClick = true;
 			return false;
 		}
 		bool handleMouseButtonReleased(MouseButtonReleased& e)
@@ -100,11 +77,7 @@ namespace Referencer {
 				firstMouse = true;
 				captureMouse = false;
 			}
-			else if (e.getMouseButton() == GLFW_MOUSE_BUTTON_3)
-			{
-				captureWheelClick = false;
-				firstMouse = true;
-			}
+
 			return false;
 		}
 	public:
@@ -148,7 +121,6 @@ namespace Referencer {
 		{
 			float deltaTime = 0.001f;
 			EventDispatcher dispatcher(event);
-			dispatcher.dispatch<KeyPressedEvent>(std::bind(&TestLayer::handleKeyboard, this, std::placeholders::_1));
 			dispatcher.dispatch<MouseScrolledEvent>(std::bind(&TestLayer::handleScroll, this, std::placeholders::_1));
 			dispatcher.dispatch<MouseMovedEvent>(std::bind(&TestLayer::handleMouse, this, std::placeholders::_1));
 			dispatcher.dispatch<MouseButtonPressed>(std::bind(&TestLayer::handleMouseButtonPressed, this, std::placeholders::_1));
