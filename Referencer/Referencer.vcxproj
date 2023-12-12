@@ -143,6 +143,7 @@
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ExampleLayer.h" />
+    <ClInclude Include="src\ID.h" />
     <ClInclude Include="src\KeyCodes.h" />
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerStack.h" />
@@ -195,10 +196,6 @@
     <ProjectReference Include="vendor\glm\GLM.vcxproj">
       <Project>{05EB870B-71F4-877C-FA6F-9E7C6678937C}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resources\modelShader.fragment" />
-    <None Include="resources\modelShader.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

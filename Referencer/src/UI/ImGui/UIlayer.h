@@ -18,9 +18,8 @@ namespace Referencer {
 	private:
 		std::vector<Viewport*> m_viewports;
 		float m_zoom, m_instantZoom;
-		int m_offsetX, m_offsetY, m_instantOffsetX, m_instantOffsetY;
+		int m_offsetX, m_offsetY, m_instantOffsetX, m_instantOffsetY, m_viewportIndex;
 		bool m_showMenu; 
-// meshes and camera rotation matrix
 		
 
 	public:

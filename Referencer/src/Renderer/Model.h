@@ -10,6 +10,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/Logger.hpp>
+#include <assimp/DefaultLogger.hpp>
 
 #include "Renderer\Mesh.h"
 #include "Renderer\Shader.h"
@@ -85,6 +87,7 @@ namespace Referencer {
         void loadModel(std::string const& path)
         {
             // read file via ASSIMP
+            Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
             Assimp::Importer importer;
             const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
             // check for errors
@@ -152,16 +155,6 @@ namespace Referencer {
                     vec.x = mesh->mTextureCoords[0][i].x;
                     vec.y = mesh->mTextureCoords[0][i].y;
                     vertex.TexCoords = vec;
-                    // tangent
-                    vector.x = mesh->mTangents[i].x;
-                    vector.y = mesh->mTangents[i].y;
-                    vector.z = mesh->mTangents[i].z;
-                    vertex.Tangent = vector;
-                    // bitangent
-                    vector.x = mesh->mBitangents[i].x;
-                    vector.y = mesh->mBitangents[i].y;
-                    vector.z = mesh->mBitangents[i].z;
-                    vertex.Bitangent = vector;
                 }
                 else
                     vertex.TexCoords = glm::vec2(0.0f, 0.0f);

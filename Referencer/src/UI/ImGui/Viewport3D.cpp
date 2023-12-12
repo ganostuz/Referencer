@@ -7,18 +7,20 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Referencer {
 
 	Viewport3D::Viewport3D(std::string name, bool isOpen)
-		:Viewport(name, isOpen), m_firstMouse(true), m_captureMouse(false),m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj")
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj"), m_first_time(true),m_scale(1.0f), m_lightColor{1.0f, 1.0f, 1.0f}, m_lightStrength(1),m_lightPos{2.0f,2.0f,2.0f}, m_objectColor{0.5f, 0.5f, 0.5f}, m_translate{ 0.0f, 0.0f, 0.0f }, m_interpolation(0.0f)
 	{
 		genBuffers();
+		m_hasTexture = m_model.textures_loaded.size() > 0;
 	}
 
 	void Viewport3D::handleInput()
 	{
-
+		
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 			setRunning(false);
 		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
@@ -31,10 +33,10 @@ namespace Referencer {
 
 			if (!m_firstMouse)
 			{
-				m_camera.Rotate(glm::vec2(lastX, lastY), glm::vec2(currPos.x, currPos.y), glm::vec2(m_width, m_height));
+				m_camera.Rotate(glm::vec2(m_lastMouse.x, m_lastMouse.y), glm::vec2(currPos.x, currPos.y), glm::vec2(m_width, m_height));
 			}
-			lastX = currPos.x;
-			lastY = currPos.y;
+			m_lastMouse.x = currPos.x;
+			m_lastMouse.y = currPos.y;
 			m_firstMouse = false;
 		}
 		else
@@ -56,6 +58,7 @@ namespace Referencer {
 
 	}
 
+
 	void Viewport3D::genBuffers()
 	{
 		glGenFramebuffers(1, &m_fbo);
@@ -65,8 +68,8 @@ namespace Referencer {
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);  // width and height
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
 
 		glGenRenderbuffers(1, &m_rbo);
@@ -89,49 +92,45 @@ namespace Referencer {
 		glDeleteFramebuffers(1, &m_fbo);
 	}
 
-	void Viewport3D::renderModel()
+	void Viewport3D::renderImGuiModelSpecs()
 	{
-
-		glViewport(0, 0, m_width, m_height);
-		m_shader.bind();
-
-		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(30.0f), (float)m_width / (float)m_height, 0.1f, 100.0f);
-		glm::mat4 view = m_camera.GetViewMatrix();
-		m_shader.setMat4("projection", projection);
-		m_shader.setMat4("view", view);
-
-		// render the loaded model
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		m_shader.setMat4("model", model);
-		m_model.Draw(m_shader);
-
-		m_shader.unBind();
-	}
-
-	void Viewport3D::onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom)
-	{
-		// fuj ale funguje
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo); // enable depth testing (is disabled for rendering screen-space quad)
-
-		// make sure we clear the framebuffer's content
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		renderModel();
-		
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(.0f, .0f));
+		float cols[3];
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
 
-		ImGui::Begin((getName() + " 3D").c_str(), &isRunning(), windowFlags);
+		ImGui::Begin(("Settings##" + getFullName()).c_str(), &isRunning(), windowFlags);
 
-		if (ImGui::IsWindowFocused())
+		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
+			setRunning(false);
+		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
+			setOpened(false);
+
+		ImGui::ColorEdit3("Light color", m_lightColor);
+		ImGui::ColorEdit3("Object color", m_objectColor);
+		ImGui::SliderFloat("LightPosX", &m_lightPos[0], -10.f, 10.f, "%.2f");
+		ImGui::SliderFloat("LightPosY", &m_lightPos[1], -10.f, 10.f, "%.2f");
+		ImGui::SliderFloat("LightPosZ", &m_lightPos[2], -10.f, 10.f, "%.2f");
+		ImGui::SliderFloat("ObjectPosX", &m_translate[0], -5.f, 5.f, "%.2f");
+		ImGui::SliderFloat("ObjectPosY", &m_translate[1], -5.f, 5.f, "%.2f");
+		ImGui::SliderFloat("ObjectPosZ", &m_translate[2], -5.f, 5.f, "%.2f");
+		ImGui::SliderFloat("Scale Object", &m_scale, 0.f, 10.f, "%.3f");
+		ImGui::BeginDisabled(!m_hasTexture);
+		ImGui::SliderFloat("Material vs Texture", &m_interpolation, 0, 1.f, "%.3f");
+		ImGui::EndDisabled();
+
+		ImGui::End();
+
+	}
+
+	void Viewport3D::renderImGuiModel()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollWithMouse| ImGuiWindowFlags_NoScrollbar;// todo: handle it normalne by si scrollbar ani scrolling zakazovat nemusel
+		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+
+		ImGui::Begin(getFullName().c_str(), &isRunning(), windowFlags);
+
+		if (ImGui::IsWindowHovered())
 		{
 			handleInput();
 		}
@@ -146,10 +145,79 @@ namespace Referencer {
 		}
 
 		ImGui::Image((void*)(intptr_t)m_texture, ImVec2{ (float)m_width, (float)m_height }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		std::cout << m_width << " " << m_height << std::endl;
+		std::cout << ImGui::GetWindowSize().x << " " << ImGui::GetWindowSize().y << std::endl;
 		ImGui::End();
 
 		ImGui::PopStyleVar();
+	}
+
+	void Viewport3D::renderModel()
+	{
+
+		glViewport(0, 0, m_width, m_height);
+		std::cout << m_width << " " << m_height << std::endl;
+		m_shader.bind();
+
+		// view/projection transformations
+		glm::mat4 projection = glm::perspective(glm::radians(30.0f), (float)m_width / (float)m_height, 0.1f, 100.0f);
+		glm::mat4 view = m_camera.GetViewMatrix();
+		m_shader.setMat4("projection", projection);
+		m_shader.setMat4("view", view);
+		m_shader.setUniform3f("lightPos", m_lightPos[0], m_lightPos[1], m_lightPos[2]);
+		m_shader.setUniform3f("lightColor", m_lightColor[0], m_lightColor[1], m_lightColor[2]);
+		m_shader.setUniform3f("objectColor", m_objectColor[0], m_objectColor[1], m_objectColor[2]);
+		m_shader.setUniform1f("interpolation", m_interpolation);
+
+		// render the loaded model
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(m_translate[0], m_translate[1], m_translate[2])); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(m_scale));	// it's a bit too big for our scene, so scale it down
+		m_shader.setMat4("model", model);
+		m_model.Draw(m_shader);
+
+		m_shader.unBind();
+	}
+
+	void Viewport3D::onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom)
+	{
+		// fuj ale funguje
+		deleteBuffers();
+		genBuffers();
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo); // enable depth testing (is disabled for rendering screen-space quad)
+
+		// make sure we clear the framebuffer's content
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		renderModel();
+		
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin(("dock##" + getFullName()).c_str(), &isRunning(), ImGuiWindowFlags_NoTitleBar);
+
+		ImGuiID dockspace_id = ImGui::GetID(("dock##" + getFullName()).c_str());
+		ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
+
+		if (m_first_time) {
+			m_first_time = false;
+
+			ImGui::DockBuilderRemoveNode(dockspace_id);  // clear any previous layout
+			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_PassthruCentralNode);
+			ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(m_width, m_height));
+
+
+
+			// we now dock our windows into the docking node we made above
+			ImGui::DockBuilderDockWindow(("Settings##" + getFullName()).c_str(), dockspace_id);
+			ImGui::DockBuilderDockWindow(getFullName().c_str(), dockspace_id);
+			ImGui::DockBuilderFinish(dockspace_id);
+		}
+		ImGui::End();
 		ImGui::PopStyleVar();
+		renderImGuiModelSpecs();
+		renderImGuiModel();
 	}
 
 	void Viewport3D::onEvent(Event& e)
@@ -159,6 +227,20 @@ namespace Referencer {
 	Viewport3D::~Viewport3D()
 	{
 		deleteBuffers();
+	}
+
+	void Viewport3D::computeLightPos(float distance, glm::vec2 deltaAngleRadians)
+	{
+		glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), deltaAngleRadians.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		rotationMatrix = glm::rotate(rotationMatrix, deltaAngleRadians.y, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		glm::vec3 newLightPosition = glm::vec3(rotationMatrix * glm::vec4(m_lightPos[0], m_lightPos[1], m_lightPos[2], 1.0f));
+
+		// Ensure the light maintains its distance from the center
+		glm::vec3 lightPos = glm::normalize(newLightPosition) * distance;
+		m_lightPos[0] = lightPos.x;
+		m_lightPos[1] = lightPos.y;
+		m_lightPos[2] = lightPos.z;
 	}
 
 }

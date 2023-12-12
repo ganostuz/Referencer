@@ -12,8 +12,6 @@ namespace Referencer {
 	class Viewport3D : public Viewport
 	{
 	private:
-		std::string m_name;
-		bool m_opened;
 
 		//renderer
 		Model m_model;
@@ -21,16 +19,21 @@ namespace Referencer {
 		Shader m_shader;
 
 		unsigned int m_fbo, m_texture, m_rbo, m_width, m_height;
+		bool m_firstMouse, m_first_time, m_hasTexture; // one time usage
+		glm::vec2 m_lastMouse;
+		//light, color, material settings
+		float m_lightStrength, m_scale, m_interpolation;
+		float m_objectColor[3], m_lightColor[3], m_lightPos[3], m_translate[3];
+		
 
-		bool m_firstMouse, m_captureMouse;
-		float lastX, lastY;
-
-		void renderModel();
 		void handleInput(); // uses imgui events so must be in imgui context
 		void genBuffers();
 		void deleteBuffers();
+		void renderModel();
+		void renderImGuiModelSpecs();
+		void renderImGuiModel();
+		void computeLightPos(float distance, glm::vec2 deltaAngleRadians);
 
-		
 	public:
 		Viewport3D(std::string name, bool isOpen);
 		~Viewport3D();

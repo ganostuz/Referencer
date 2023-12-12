@@ -22,6 +22,7 @@ namespace Referencer {
         // uniforms, add glm
         void setUniform1f(const std::string& name, float value);
         void setUniform4f(const std::string& name, float f0, float f1, float f2, float f3);
+        void setUniform3f(const std::string& name, float f0, float f1, float f2);
         void setMat4(const std::string& name, const glm::mat4& mat);
         //void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
 

@@ -37,7 +37,6 @@ namespace Referencer {
 		// there is a mistake viac sa to presuva k miske nez von
 		m_posX = m_posX + deltaX / zoom * (ZOOM_SENSITIVITY * 0.05f);
 		m_posY = m_posY + deltaY / zoom * (ZOOM_SENSITIVITY * 0.05f);
-
 		ImGui::SetNextWindowPos(ImVec2{ m_posX, m_posY });
 
 		ImGui::SetNextWindowSize(ImVec2{ 
@@ -52,6 +51,7 @@ namespace Referencer {
 		:Viewport(name, isOpen), m_texture(0), m_ratio(0.f), m_posX(posX), m_posY(posY)
 	{
 		// TODO: will go to render
+		
 		int tempWidth, tempHeight;
 		stbi_set_flip_vertically_on_load(false);
 		unsigned char* image_data = stbi_load(source.c_str(), &tempWidth, &tempHeight, NULL, 4);
@@ -93,7 +93,6 @@ namespace Referencer {
 			zoom(instantZoom);
 		}
 			
-
 		ImGui::Begin(getName().c_str(), &isRunning(), windowFlags);
 		
 		//idk maybe overhead

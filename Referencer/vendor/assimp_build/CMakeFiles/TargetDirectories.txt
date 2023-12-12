@@ -1,0 +1,13 @@
+C:/Users/guzst/Downloads/assimp_build/CMakeFiles/uninstall.dir
+C:/Users/guzst/Downloads/assimp_build/CMakeFiles/UpdateAssimpLibsDebugSymbolsAndDLLs.dir
+C:/Users/guzst/Downloads/assimp_build/CMakeFiles/INSTALL.dir
+C:/Users/guzst/Downloads/assimp_build/CMakeFiles/ALL_BUILD.dir
+C:/Users/guzst/Downloads/assimp_build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/guzst/Downloads/assimp_build/contrib/zlib/CMakeFiles/zlibstatic.dir
+C:/Users/guzst/Downloads/assimp_build/contrib/zlib/CMakeFiles/INSTALL.dir
+C:/Users/guzst/Downloads/assimp_build/contrib/zlib/CMakeFiles/ALL_BUILD.dir
+C:/Users/guzst/Downloads/assimp_build/code/CMakeFiles/assimp.dir
+C:/Users/guzst/Downloads/assimp_build/code/CMakeFiles/INSTALL.dir
+C:/Users/guzst/Downloads/assimp_build/test/CMakeFiles/unit.dir
+C:/Users/guzst/Downloads/assimp_build/test/CMakeFiles/INSTALL.dir
+C:/Users/guzst/Downloads/assimp_build/test/headercheck/CMakeFiles/INSTALL.dir

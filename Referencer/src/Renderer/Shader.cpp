@@ -108,6 +108,10 @@ namespace Referencer {
 	{
 		glUniform4f(getUniformLocation(name), f0, f1, f2, f3);
 	}
+	void Shader::setUniform3f(const std::string& name, float f0, float f1, float f2)
+	{
+		glUniform3f(getUniformLocation(name), f0, f1, f2);
+	}
 	void Shader::setMat4(const std::string& name, const glm::mat4& mat)
 	{
 		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);

@@ -17,7 +17,7 @@
 namespace Referencer {
 
     UIlayer::UIlayer()
-        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f)
+        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f), m_viewportIndex(1)
     {
     }
     
@@ -91,6 +91,7 @@ namespace Referencer {
 
         // Setup Platform/Renderer bindings
         // Setup Platform/Renderer backends
+        //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
 
@@ -141,14 +142,6 @@ namespace Referencer {
         {
             m_instantZoom = 0.0f;
         }
-        /*
-            halfX = SCREEN_WIDTH / 2
-            halfY = SCREEN_HEIGHT / 2
-                deltaX = xPos - halfX;
-            deltaY = yPos - halfY;
-            x = halfX + deltaX * zoom + xOff;
-            y = halfY + deltaY * zoom + yOff;
-        */
 
         // pass into it correct/instant offset
         UpdateViewports(); // deletes viewports with delete flag + updates them based on pan, zoom
@@ -174,6 +167,7 @@ namespace Referencer {
     {
         static bool idk = true;
         ImGui_ImplOpenGL3_NewFrame();
+        glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         //ImGui::LoadIniSettingsFromMemory(); // from your own file
@@ -229,7 +223,7 @@ namespace Referencer {
                 // if viewport is selected erase
                 break;
             }
-            else if ((*it)->getIsOpened())
+            else if ((*it)->isOpened())
                 (*it)->onUpdate(m_instantOffsetX, m_instantOffsetY, m_instantZoom, m_zoom); // tu treba passnut offsety a zoom
             /*
             halfX = SCREEN_WIDTH / 2
@@ -311,7 +305,9 @@ namespace Referencer {
                     std::string path = loadFileDialog("Referencer file (*.ref)\0*.ref\0*.png\0*.png\0*.jpg\0*.jpg\0");
                     if (path != "")
                     {
-                        m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true, path));
+                        std::string name = "viewport(2D)_";
+                        m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
+                        m_viewportIndex++;
                         //m_selected.push_back(false);
                     }
                 }
@@ -364,13 +360,16 @@ namespace Referencer {
     void UIlayer::RenderLayerManager()
     {
         if (ImGui::Button("+ 2d viewport")) {
-            m_viewports.push_back(new Viewport2D(std::to_string(glfwGetTime()), true, "")); // source must not be empty or black screen
-            //m_selected.push_back(false); // selected tiez pojde to viewports
+
+            std::string name = "viewport(2D) ";
+            m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, ""));
+            m_viewportIndex++; 
         }
         ImGui::SameLine(ImGui::GetWindowWidth() - 100);
         if (ImGui::Button("+ 3d viewport")) {
-            m_viewports.push_back(new Viewport3D(std::to_string(glfwGetTime()), true));
-            //m_selected.push_back(false);
+            std::string name = "viewport(3D) ";
+            m_viewports.push_back(new Viewport3D(name + std::to_string(m_viewportIndex), true));
+            m_viewportIndex++;
         }
 
         
@@ -378,33 +377,98 @@ namespace Referencer {
 
     void UIlayer::RenderViewports()
     {
+        ImGuiStyle& style = ImGui::GetStyle();
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 20));
         for (int i = 0; i < m_viewports.size(); i++)
         {
-            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
+            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isOpened());
+        }
+        ImGui::PopStyleVar();
+
+
+
+        ImGui::Begin("Test");
+        ImGui::Text("Layer names");
+        ImGui::SameLine(ImGui::GetWindowWidth() - 70.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
+        ImGui::Text("Visibility");
+        ImGui::Separator();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {style.FramePadding.x, 4 });
+
+        
+            for (int i = 0; i < m_viewports.size(); i++)
+            {
+                //ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isSelected());
+                ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0, 0.5));
+                ImGui::Selectable(m_viewports[i]->getName().c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 23.0f));
+                ImGui::PopStyleVar();
+                
+
+                ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
+                //ImGui::PushStyleVar(ImGuiStyleVar_Rounding);
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+                ImGui::Checkbox(("##" + std::to_string(m_viewports[i]->getID().get())).c_str(), &m_viewports[i]->isOpened());
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+
+            }
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
+
+
+        ImGui::End();
+
+
+
+    }
+    /*
+    void UIlayer::RenderViewports()
+    {
+        for (int i = 0; i < m_viewports.size(); i++)
+        {
+            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isOpened());
         }
 
         ImGuiStyle& style = ImGui::GetStyle();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0,0 });
         ImGui::Begin("Test");
+
         if (ImGui::BeginTable("table", 1, ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable))
         {
             for (int i = 0; i < m_viewports.size(); i++)
             {
-                ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 10, 10 });// okliestenie checkbox
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, style.CellPadding.y * 2)); // Fix
                 ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 15, style.CellPadding.y }); // vyska riadku
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 12.5, 0 });
 
                 ImGui::TableNextRow(0, .0f); // min row height
                 ImGui::TableSetColumnIndex(0);
-                ImGui::SetNextItemAllowOverlap();
-                ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->getIsOpened());
+                //ImGui::SetNextItemAllowOverlap();
+                //ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isSelected());
+                ImGui::Selectable(m_viewports[i]->getName().c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap);
+                if (ImGui::IsMouseDoubleClicked(0) && ImGui::IsItemHovered()) {
+                    ImGui::OpenPopup("MyPopup");
+                }
+
+                // Create the popup
+                if (ImGui::BeginPopupModal("MyPopup")) {
+                    ImGui::Text("You did it!");
+                    static char buffer[256];
+                    ImGui::InputText("New Name", buffer, sizeof(buffer));
+                    if (ImGui::Button("OK")) {
+                        
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
 
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x * 2, style.ItemSpacing.y)); // Fix
 
                 ImGui::SameLine(ImGui::GetWindowWidth() - 20.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
-                ImGui::Checkbox(("##" + m_viewports[i]->getName()).c_str(), &m_viewports[i]->getIsOpened());
+                ImGui::Checkbox(("##" + std::to_string(m_viewports[i]->getID().get())).c_str(), &m_viewports[i]->isOpened());
                 ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
@@ -420,5 +484,6 @@ namespace Referencer {
 
 
     }
+    */
 
 }
