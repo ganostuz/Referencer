@@ -12,7 +12,7 @@
 namespace Referencer {
 
 	Viewport3D::Viewport3D(std::string name, bool isOpen)
-		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj"), m_first_time(true),m_scale(1.0f), m_lightColor{1.0f, 1.0f, 1.0f}, m_lightStrength(1),m_lightPos{2.0f,2.0f,2.0f}, m_objectColor{0.5f, 0.5f, 0.5f}, m_translate{ 0.0f, 0.0f, 0.0f }, m_interpolation(0.0f)
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/cube.obj"), m_first_time(true),m_scale(1.0f), m_lightColor{1.0f, 1.0f, 1.0f}, m_lightStrength(1),m_lightPos{2.0f,2.0f,2.0f}, m_objectColor{0.5f, 0.5f, 0.5f}, m_translate{ 0.0f, 0.0f, 0.0f }, m_interpolation(0.0f)
 	{
 		genBuffers();
 		m_hasTexture = m_model.textures_loaded.size() > 0;
@@ -156,18 +156,33 @@ namespace Referencer {
 	{
 
 		glViewport(0, 0, m_width, m_height);
-		std::cout << m_width << " " << m_height << std::endl;
 		m_shader.bind();
 
 		// view/projection transformations
+		glm::vec3 cameraPosition = m_camera.GetEye();
+
 		glm::mat4 projection = glm::perspective(glm::radians(30.0f), (float)m_width / (float)m_height, 0.1f, 100.0f);
 		glm::mat4 view = m_camera.GetViewMatrix();
+		
+		//camera & control
 		m_shader.setMat4("projection", projection);
 		m_shader.setMat4("view", view);
-		m_shader.setUniform3f("lightPos", m_lightPos[0], m_lightPos[1], m_lightPos[2]);
-		m_shader.setUniform3f("lightColor", m_lightColor[0], m_lightColor[1], m_lightColor[2]);
-		m_shader.setUniform3f("objectColor", m_objectColor[0], m_objectColor[1], m_objectColor[2]);
+		m_shader.setUniform3f("viewPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 		m_shader.setUniform1f("interpolation", m_interpolation);
+
+
+		// all values below to material struct + make light class with rendering, position, color, etc.
+		// light
+		m_shader.setUniform3f("light.ambient", m_lightColor[0] * 0.2, m_lightColor[1] * 0.2, m_lightColor[2] * 0.2);
+		m_shader.setUniform3f("light.diffuse", m_lightColor[0] * 0.5f, m_lightColor[1] * 0.5f, m_lightColor[2] * 0.5f); // darken diffuse light a bit
+		m_shader.setUniform3f("light.specular", m_lightColor[0], m_lightColor[1], m_lightColor[2]);
+		m_shader.setUniform3f("light.position", m_lightPos[0], m_lightPos[1], m_lightPos[2]);
+
+		//material
+		m_shader.setUniform3f("material.ambient", m_objectColor[0], m_objectColor[1], m_objectColor[2]);
+		m_shader.setUniform3f("material.diffuse", m_objectColor[0], m_objectColor[1], m_objectColor[2]);
+		m_shader.setUniform3f("material.specular", m_objectColor[0] * 0.6f, m_objectColor[1] * 0.6f, m_objectColor[2] * 0.6f);
+		m_shader.setUniform1f("material.shininess", 32.0f);
 
 		// render the loaded model
 		glm::mat4 model = glm::mat4(1.0f);

@@ -17,6 +17,7 @@ IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
 IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
 IncludeDir["ImGui"] = "Referencer/vendor/imGui"
 IncludeDir["assimp"] = "Referencer/vendor/assimp/include/"
+--IncludeDir["assimp"] = "Referencer/vendor/assimp_build/include/assimp/"
 IncludeDir["GLM"] = "Referencer/vendor/glm/"
 
 include "Referencer/vendor/GLFW"
@@ -51,6 +52,7 @@ project "Referencer"
 		"%{IncludeDir.assimp}",
 		"%{IncludeDir.GLM}"
 	}
+	--libdirs { "path/to/assimp/lib" }
 
 	links 
 	{ 
