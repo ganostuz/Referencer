@@ -94,6 +94,7 @@ namespace Referencer {
         //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
+        glfwSetDropCallback(window, Drop_callback);
 
     }
 
@@ -161,13 +162,13 @@ namespace Referencer {
     }
 
     // main private funcs
-    
     // begins new frame
     void UIlayer::Begin()
     {
         static bool idk = true;
         ImGui_ImplOpenGL3_NewFrame();
         glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+        
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         //ImGui::LoadIniSettingsFromMemory(); // from your own file
@@ -289,12 +290,14 @@ namespace Referencer {
         {
             if (ImGui::BeginMenu("File"))
             {
+                ImGui::VSliderFloat("idk", ImVec2(200, 200), &m_zoom, 0.0f, 10.0f);
                 if (ImGui::MenuItem("New", "CTRL + N"))
                 {
                     // Handle menu item click
                     // pop up save current layout?
                     // destroy this instance of UIlayer and viewports
                     // new UIlayer instance
+                    
                 }
                 if (ImGui::MenuItem("Save", "CTRL + S"))
                 {
@@ -342,19 +345,7 @@ namespace Referencer {
 
     void UIlayer::RenderMenu()
     {
-        ImGuiIO io = ImGui::GetIO();
-        if (ImGui::IsKeyDown(ImGuiKey_MouseRight))
-            ImGui::OpenPopup("my_select_popup");
-        if (ImGui::BeginPopup("my_select_popup"))
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                if (ImGui::Selectable("menu selectable"))
-                {
-                }
-            }
-            ImGui::EndPopup();
-        }
+        
     }
 
     void UIlayer::RenderLayerManager()

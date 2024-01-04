@@ -12,7 +12,7 @@
 namespace Referencer {
 
 	Viewport3D::Viewport3D(std::string name, bool isOpen)
-		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/cube.obj"), m_first_time(true),m_scale(1.0f), m_lightColor{1.0f, 1.0f, 1.0f}, m_lightStrength(1),m_lightPos{2.0f,2.0f,2.0f}, m_objectColor{0.5f, 0.5f, 0.5f}, m_translate{ 0.0f, 0.0f, 0.0f }, m_interpolation(0.0f)
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/cube.stl"), m_first_time(true),m_scale(1.0f), m_lightColor{1.0f, 1.0f, 1.0f}, m_lightStrength(1),m_lightPos{2.0f,2.0f,2.0f}, m_objectColor{0.5f, 0.5f, 0.5f}, m_translate{ 0.0f, 0.0f, 0.0f }, m_interpolation(0.0f), m_showSettings(false)
 	{
 		genBuffers();
 		m_hasTexture = m_model.textures_loaded.size() > 0;
@@ -95,61 +95,82 @@ namespace Referencer {
 	void Viewport3D::renderImGuiModelSpecs()
 	{
 		float cols[3];
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+		std::cout << m_showSettings << std::endl;
+		if (ImGui::Begin(("Settings##" + getFullName()).c_str(), &m_showSettings, windowFlags))
+		{
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
+				setRunning(false);
+			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
+				setOpened(false);
 
-		ImGui::Begin(("Settings##" + getFullName()).c_str(), &isRunning(), windowFlags);
+			ImGui::ColorEdit3("Light color", m_lightColor);
+			ImGui::ColorEdit3("Object color", m_objectColor);
+			ImGui::SliderFloat("LightPosX", &m_lightPos[0], -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("LightPosY", &m_lightPos[1], -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("LightPosZ", &m_lightPos[2], -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosX", &m_translate[0], -5.f, 5.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosY", &m_translate[1], -5.f, 5.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosZ", &m_translate[2], -5.f, 5.f, "%.2f");
+			ImGui::SliderFloat("Scale Object", &m_scale, 0.f, 10.f, "%.3f");
+			ImGui::BeginDisabled(!m_hasTexture);
+			ImGui::SliderFloat("Material vs Texture", &m_interpolation, 0, 1.f, "%.3f");
+			ImGui::EndDisabled();
 
-		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
-			setRunning(false);
-		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
-			setOpened(false);
-
-		ImGui::ColorEdit3("Light color", m_lightColor);
-		ImGui::ColorEdit3("Object color", m_objectColor);
-		ImGui::SliderFloat("LightPosX", &m_lightPos[0], -10.f, 10.f, "%.2f");
-		ImGui::SliderFloat("LightPosY", &m_lightPos[1], -10.f, 10.f, "%.2f");
-		ImGui::SliderFloat("LightPosZ", &m_lightPos[2], -10.f, 10.f, "%.2f");
-		ImGui::SliderFloat("ObjectPosX", &m_translate[0], -5.f, 5.f, "%.2f");
-		ImGui::SliderFloat("ObjectPosY", &m_translate[1], -5.f, 5.f, "%.2f");
-		ImGui::SliderFloat("ObjectPosZ", &m_translate[2], -5.f, 5.f, "%.2f");
-		ImGui::SliderFloat("Scale Object", &m_scale, 0.f, 10.f, "%.3f");
-		ImGui::BeginDisabled(!m_hasTexture);
-		ImGui::SliderFloat("Material vs Texture", &m_interpolation, 0, 1.f, "%.3f");
-		ImGui::EndDisabled();
-
+			
+		}
 		ImGui::End();
+
+		
 
 	}
 
 	void Viewport3D::renderImGuiModel()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImVec2 window_pos;
+
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollWithMouse| ImGuiWindowFlags_NoScrollbar;// todo: handle it normalne by si scrollbar ani scrolling zakazovat nemusel
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
 
-		ImGui::Begin(getFullName().c_str(), &isRunning(), windowFlags);
-
-		if (ImGui::IsWindowHovered())
+		if (ImGui::Begin(getFullName().c_str(), &isRunning(), windowFlags))
 		{
-			handleInput();
-		}
-		if (m_width != ImGui::GetWindowSize().x || m_height != ImGui::GetWindowSize().y)
-		{
-			m_width = ImGui::GetWindowSize().x;
-			m_height = ImGui::GetWindowSize().y;
+			window_pos = ImGui::GetWindowPos();
+			if (ImGui::IsWindowHovered())
+			{
+				handleInput();
+			}
+			if (m_width != ImGui::GetWindowSize().x || m_height != ImGui::GetWindowSize().y)
+			{
+				m_width = ImGui::GetWindowSize().x;
+				m_height = ImGui::GetWindowSize().y;
 
-			// resize
-			//deleteBuffers();
-			//genBuffers();
-		}
+				// resize
+				//deleteBuffers();
+				//genBuffers();
+			}
 
-		ImGui::Image((void*)(intptr_t)m_texture, ImVec2{ (float)m_width, (float)m_height }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-		std::cout << m_width << " " << m_height << std::endl;
-		std::cout << ImGui::GetWindowSize().x << " " << ImGui::GetWindowSize().y << std::endl;
+			ImGui::Image((void*)(intptr_t)m_texture, ImVec2{ (float)m_width, (float)m_height }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+			ImGuiIO io = ImGui::GetIO();
+			if (ImGui::IsKeyDown(ImGuiKey_MouseRight) && ImGui::IsWindowHovered())
+				ImGui::OpenPopup("my_select_popup");
+
+			ImGui::PopStyleVar();
+			if (ImGui::BeginPopup("my_select_popup"))
+			{
+				ImGui::MenuItem("Close 3D view", "Del", &isRunning());
+				ImGui::MenuItem("Hide 3D view", "H", &isOpened());
+				ImGui::MenuItem("Show settings", "idk", &m_showSettings);
+				ImGui::EndPopup();
+			}
+
+			
+			
+		}
 		ImGui::End();
-
-		ImGui::PopStyleVar();
+		
 	}
 
 	void Viewport3D::renderModel()
@@ -186,7 +207,31 @@ namespace Referencer {
 
 		// render the loaded model
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(m_translate[0], m_translate[1], m_translate[2])); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(m_translate[0], m_translate[1], m_translate[2])); // translate it down so it's at the center of the scene todo: leftmost & rightmost then center for all verticies
+
+		/*  //example
+		    glm::vec3 minCoords(FLT_MAX);
+			glm::vec3 maxCoords(-FLT_MAX);
+
+			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+			    aiVector3D vertex = mesh->mVertices[i];
+			    minCoords.x = std::min(minCoords.x, vertex.x);
+			    minCoords.y = std::min(minCoords.y, vertex.y);
+			    minCoords.z = std::min(minCoords.z, vertex.z);
+			    maxCoords.x = std::max(maxCoords.x, vertex.x);
+			    maxCoords.y = std::max(maxCoords.y, vertex.y);
+			    maxCoords.z = std::max(maxCoords.z, vertex.z);
+			}
+
+			glm::vec3 center = (minCoords + maxCoords) * 0.5f;
+
+			// Translate the model to center it
+			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+				mesh->mVertices[i] -= center;
+    }
+		
+		
+		*/
 		model = glm::scale(model, glm::vec3(m_scale));	// it's a bit too big for our scene, so scale it down
 		m_shader.setMat4("model", model);
 		m_model.Draw(m_shader);
@@ -209,29 +254,8 @@ namespace Referencer {
 		
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin(("dock##" + getFullName()).c_str(), &isRunning(), ImGuiWindowFlags_NoTitleBar);
-
-		ImGuiID dockspace_id = ImGui::GetID(("dock##" + getFullName()).c_str());
-		ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
-
-		if (m_first_time) {
-			m_first_time = false;
-
-			ImGui::DockBuilderRemoveNode(dockspace_id);  // clear any previous layout
-			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_PassthruCentralNode);
-			ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(m_width, m_height));
-
-
-
-			// we now dock our windows into the docking node we made above
-			ImGui::DockBuilderDockWindow(("Settings##" + getFullName()).c_str(), dockspace_id);
-			ImGui::DockBuilderDockWindow(getFullName().c_str(), dockspace_id);
-			ImGui::DockBuilderFinish(dockspace_id);
-		}
-		ImGui::End();
-		ImGui::PopStyleVar();
-		renderImGuiModelSpecs();
+		if (m_showSettings)
+			renderImGuiModelSpecs();
 		renderImGuiModel();
 	}
 

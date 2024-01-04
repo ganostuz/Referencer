@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
+#include <assimp\config.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/Logger.hpp>

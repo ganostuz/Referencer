@@ -18,6 +18,7 @@ namespace Referencer {
 		m_running = true;
 		m_window = std::unique_ptr<Window>(Window::create());
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
+		//m_window->glfwSetDropCallback(window, drop_callback);
 
 		glEnable(GL_DEPTH_TEST);
 		stbi_set_flip_vertically_on_load(true);

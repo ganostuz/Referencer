@@ -16,14 +16,14 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
 IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
 IncludeDir["ImGui"] = "Referencer/vendor/imGui"
-IncludeDir["assimp"] = "Referencer/vendor/assimp/include/"
---IncludeDir["assimp"] = "Referencer/vendor/assimp_build/include/assimp/"
+--IncludeDir["assimp"] = "Referencer/vendor/assimp/include/"
+--IncludeDir["assimp"] = "Referencer/vendor/assimp_build/include"
 IncludeDir["GLM"] = "Referencer/vendor/glm/"
 
 include "Referencer/vendor/GLFW"
 include "Referencer/vendor/Glad"
 include "Referencer/vendor/imGui"
-include "Referencer/vendor/assimp"
+--include "Referencer/vendor/assimp_build" 
 include "Referencer/vendor/glm"
 
 project "Referencer"
@@ -49,19 +49,20 @@ project "Referencer"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.assimp}",
+		"Referencer/vendor/assimp_build/include",
 		"%{IncludeDir.GLM}"
 	}
-	--libdirs { "path/to/assimp/lib" }
-
+	libdirs { "Referencer/vendor/assimp_build/lib/Debug"}
+	--
 	links 
 	{ 
 		"GLFW",
 		"Glad",
 		"ImGui",
 		"opengl32.lib",
-		"assimp",
-		"GLM"
+		"GLM",
+		"assimp-vc143-mtd.lib",
+		"zlibstaticd.lib"
 	}
 
 	filter "system:windows"

@@ -19,7 +19,7 @@ namespace Referencer {
 		Shader m_shader;
 
 		unsigned int m_fbo, m_texture, m_rbo, m_width, m_height;
-		bool m_firstMouse, m_first_time, m_hasTexture; // one time usage
+		bool m_firstMouse, m_first_time, m_hasTexture, m_showSettings; // one time usage
 		glm::vec2 m_lastMouse;
 		//light, color, material settings
 		float m_lightStrength, m_scale, m_interpolation;
