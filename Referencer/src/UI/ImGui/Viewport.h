@@ -8,7 +8,7 @@ namespace Referencer {
 	{
 	private:
 		bool m_isOpen, m_running, m_selected; // proste na komunikaciu s layout managerom
-		ID m_id;
+		ID m_id; // prerob na binary flags
 		std::string m_name;
 	public:
 		 Viewport(std::string name, bool isOpen)
@@ -16,6 +16,8 @@ namespace Referencer {
 
 		virtual void onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom) = 0;
 		virtual void onEvent(Event& e) = 0;
+		virtual int getType() = 0;
+		virtual Viewport* clone() = 0;
 
 		inline std::string& getName() { return m_name; }
 		inline std::string getFullName() { return m_name + std::string("##") + std::to_string(m_id.get()); }
@@ -25,7 +27,7 @@ namespace Referencer {
 		inline bool setRunning(bool terminate) { return m_running = terminate; }
 		inline bool& isSelected() { return m_selected; }
 		inline void setSelected(bool select) { m_selected = select;  }
-		inline ID getID() { return m_id; }
+		inline ID& getID() { return m_id; }
 
 		//inline bool& isOpen() { return *m_isOpen; }
 

@@ -10,11 +10,21 @@
 
 namespace Referencer {
 
-	const float ZOOM_SENSITIVITY = 5.0f;
+	const float ZOOM_SENSITIVITY = 10.0f;
 
 	void Viewport2D::handleInput()
 	{
-		//handle keyboard
+		setSelected(true);
+			
+
+		ImGuiIO io = ImGui::GetIO();
+		if (io.MouseWheel != 0.0f)
+		{
+			m_width = m_width * (1 + io.MouseWheel / ZOOM_SENSITIVITY);
+			m_height = m_height * (1 + io.MouseWheel / ZOOM_SENSITIVITY);
+			ImGui::SetWindowSize(ImVec2(m_width, m_height));
+
+		}
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 			setRunning(false);
 		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
@@ -28,34 +38,17 @@ namespace Referencer {
 	}
 	void Viewport2D::zoom(float zoom)
 	{
-		float cursorX = ImGui::GetMousePos().x;
-		float cursorY = ImGui::GetMousePos().y;
 
-		float deltaX = m_posX - cursorX;
-		float deltaY = m_posY - cursorY;
-
-		// there is a mistake viac sa to presuva k miske nez von
-		m_posX = m_posX + deltaX / zoom * (ZOOM_SENSITIVITY * 0.05f);
-		m_posY = m_posY + deltaY / zoom * (ZOOM_SENSITIVITY * 0.05f);
-		ImGui::SetNextWindowPos(ImVec2{ m_posX, m_posY });
-
-		ImGui::SetNextWindowSize(ImVec2{ 
-			m_width + (ZOOM_SENSITIVITY * zoom ), 
-			m_height + (ZOOM_SENSITIVITY * zoom ) 
-			});
-		std::cout << "size: " << m_width + (ZOOM_SENSITIVITY * zoom) << "  " << m_height + (ZOOM_SENSITIVITY * zoom) << std::endl;
-		std::cout << "pos: " << m_posX << "  " << m_posY << std::endl;
 	}
 	// constructor takes name bool isOpen and sourcem image path
 	Viewport2D::Viewport2D(std::string name, bool isOpen, std::string source, int posX, int posY)
-		:Viewport(name, isOpen), m_texture(0), m_ratio(0.f), m_posX(posX), m_posY(posY)
+		:Viewport(name, isOpen), m_texture(0), m_posX(posX), m_posY(posY), m_imageSource(source)
 	{
-		// TODO: will go to render
+		// TODO: popripade mozes nechat nacitany obrazok do pamate
 		
 		int tempWidth, tempHeight;
 		stbi_set_flip_vertically_on_load(false);
-		unsigned char* image_data = stbi_load(source.c_str(), &tempWidth, &tempHeight, NULL, 4);
-		m_ratio = tempWidth / tempHeight;
+		unsigned char* image_data = stbi_load(source.c_str(), &tempWidth, &tempHeight, NULL, 4); // ak vrate nullptr zrus vytvorenie okna to iste 3D
 
 		// Create a OpenGL texture identifier
 		glGenTextures(1, &m_texture);
@@ -75,6 +68,30 @@ namespace Referencer {
 		}
 		// above to render
 	}
+	Viewport2D::Viewport2D(const Viewport2D& other)
+		:Viewport(other), m_texture(0), m_posX(other.m_posX+10), m_posY(other.m_posY + 10), m_imageSource(other.m_imageSource)
+	{
+		int tempWidth, tempHeight;
+		stbi_set_flip_vertically_on_load(false);
+		unsigned char* image_data = stbi_load(m_imageSource.c_str(), &tempWidth, &tempHeight, NULL, 4); // ak vrate nullptr zrus vytvorenie okna to iste 3D
+
+		// Create a OpenGL texture identifier
+		glGenTextures(1, &m_texture);
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+
+		// Setup filtering parameters for display
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		// Upload pixels into texture
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tempWidth, tempHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+		if (image_data)
+		{
+			stbi_image_free(image_data);
+		}
+	}
 	// function called every frame
 	void Viewport2D::onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom)
 	{
@@ -88,26 +105,22 @@ namespace Referencer {
 		{
 			pan(offsetX, offsetY);
 		}
-		else if (instantZoom != 0.0f)
-		{
-			zoom(instantZoom);
-		}
-			
-		ImGui::Begin(getName().c_str(), &isRunning(), windowFlags);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.4f, 0.8f, 0.8f, 1.0f));
+		ImGui::Begin(getFullName().c_str(), &isRunning(), windowFlags);
+
 		
 		//idk maybe overhead
 
 		m_width = ImGui::GetWindowSize().x;
 		m_height = ImGui::GetWindowSize().y;
-		m_ratio = m_width / m_height;
 
 		m_posX = ImGui::GetWindowPos().x;
 		m_posY = ImGui::GetWindowPos().y;
 
-		if (ImGui::IsWindowFocused())
-		{
+		if (ImGui::IsWindowHovered())
 			handleInput();
-		}
+		else
+			setSelected(false);
 		// will go to render
 		
 
@@ -115,12 +128,23 @@ namespace Referencer {
 		ImGui::End();
 
 		//ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
 	}
 	//event handler
 	void Viewport2D::onEvent(Event& e)
 	{
+	}
+
+	int Viewport2D::getType()
+	{
+		return 0;
+	}
+
+	Viewport* Viewport2D::clone()
+	{
+		return new Viewport2D(*this);
 	}
 
 }

@@ -28,7 +28,7 @@ include "Referencer/vendor/glm"
 
 project "Referencer"
 	location "Referencer"
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	language "C++"
 	staticruntime "on"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")

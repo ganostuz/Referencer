@@ -6,9 +6,11 @@
 #include "events\MouseEvent.h"
 #include "KeyCodes.h"
 
+#include "imgui_internal.h"
 #include "GLFW\glfw3.h"
 #define GLFW_EXPOSE_NATIVE_WIN32 
 #include "GLFW\glfw3native.h"
+#include "backends\imgui_impl_glfw.h"
 
 
 
@@ -17,10 +19,10 @@
 namespace Referencer {
 
     UIlayer::UIlayer()
-        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f), m_viewportIndex(1)
+        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f), m_viewportIndex(1), m_wasCopyed(false), m_renameBuffer(""), m_renameViewportPointer(nullptr)
     {
     }
-    
+
 
     UIlayer::~UIlayer()
     {
@@ -50,10 +52,10 @@ namespace Referencer {
         style.GrabRounding = 5.0f;
         style.PopupRounding = 5.0f;
         style.ScrollbarRounding = 5.0f;
-        
+
         // callbacks
 
-        
+
 
         //colors
         auto& colors = ImGui::GetStyle().Colors;
@@ -94,8 +96,6 @@ namespace Referencer {
         //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
-        glfwSetDropCallback(window, Drop_callback);
-
     }
 
     void UIlayer::onDetach()
@@ -104,13 +104,16 @@ namespace Referencer {
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
-    
+
     void UIlayer::onUpdate()
     {
         // first checks if deleted update();
         // than renders compoments render();
         // in which helper funcition renderViewports, renderMenu, renderViewportStack, etc
         Begin(); // begins new frame
+
+        if(ImGui::IsKeyReleased(ImGuiKey_D))
+            m_wasCopyed = false;
         if (ImGui::IsMouseDragging(0) && ImGui::IsKeyDown(ImGuiKey_LeftShift))
         {
             ImVec2 delta = ImGui::GetMouseDragDelta(0);
@@ -122,6 +125,7 @@ namespace Referencer {
             m_offsetY = delta.y;
 
         }
+
         if (ImGui::IsMouseReleased(0))
         {
             m_offsetX = 0.0f;
@@ -131,24 +135,32 @@ namespace Referencer {
             m_instantOffsetY = 0.0f;
         }
 
-        ImGuiIO io = ImGui::GetIO();
+        if (ImGui::IsKeyDown(ImGuiKey_LeftShift) && ImGui::IsKeyDown(ImGuiKey_D) && !m_wasCopyed)
+        {
+            std::vector<Viewport*> duplicatedViewports;
 
-        if (io.MouseWheel != 0.0f) 
-        {
-            m_instantZoom = io.MouseWheel;
-            m_zoom += io.MouseWheel;
-            std::cout << m_zoom << std::endl;
+            for (int i = 0; i < m_viewports.size(); ++i)
+            {
+                if (m_viewports[i]->isSelected())
+                    duplicatedViewports.push_back(m_viewports[i]->clone());
+            }
+            m_viewports.insert(m_viewports.end(), duplicatedViewports.begin(), duplicatedViewports.end());
+            m_wasCopyed = true;
         }
-        else
-        {
-            m_instantZoom = 0.0f;
-        }
+        // ak ctrl+c prejdes vsetky viewporty a zapises ich id potom ctrl+v porovnanvas s existujucimi ak su init a push
+        // alternativa ctrl+c vytvoris ich a pridas do stacku copied ak ctrl+v pushe cely stack 
+        // handlenes to s imgui copy&paste ImGui::SetClipboardText(); // get
+        // calc. stred objektu
+        // sprav KSI & pozri ako presne sa vytvara okno ked imgui viewport je enabled
+
+
+
 
         // pass into it correct/instant offset
         UpdateViewports(); // deletes viewports with delete flag + updates them based on pan, zoom
 
         Render(); // renders components
-        
+
         End(); // renders imgui
     }
 
@@ -156,24 +168,25 @@ namespace Referencer {
     {
         std::cout << this->getName() << e << std::endl;
         ImGuiIO& io = ImGui::GetIO();
-        
+
+        EventDispatcher dispatcher(e);
+        dispatcher.dispatch<DragAndDropEvent>(std::bind(&UIlayer::handleDrops, this, std::placeholders::_1));
+
         e.setHandled((e.isInCategory(EventCategoryMouse) && io.WantCaptureMouse) ||
-            (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));
+            (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));// tu bude asii problem pokial drag and drop prejde bez toho aby bol oznaceny ako handled
     }
 
     // main private funcs
     // begins new frame
     void UIlayer::Begin()
     {
-        static bool idk = true;
         ImGui_ImplOpenGL3_NewFrame();
-        glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
-        
+        //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         //ImGui::LoadIniSettingsFromMemory(); // from your own file
-        ImGui::ShowDemoWindow(&idk);
-       
+
     }
 
     // renders imgui
@@ -198,8 +211,7 @@ namespace Referencer {
     // renders components
     void UIlayer::Render()
     {
-        ImGui::Begin("layers");
-        
+
         RenderMainMenu();
 
         RenderMenu();
@@ -208,33 +220,15 @@ namespace Referencer {
 
         RenderViewports();
 
-        ImGui::End();
     }
 
     // deletes viewports with delete flag + render 2d,3d viewports that are not hidden
     void UIlayer::UpdateViewports()
     {
-        for (auto it = m_viewports.begin(); it != m_viewports.end(); it++)
-        {
-            if (!(*it)->isRunning())
-            {
-                delete* it; // to do implement another data structure
-                m_viewports.erase(it);
-                //m_selected.erase(i); // todo seleced remove handling
-                // if viewport is selected erase
-                break;
-            }
-            else if ((*it)->isOpened())
-                (*it)->onUpdate(m_instantOffsetX, m_instantOffsetY, m_instantZoom, m_zoom); // tu treba passnut offsety a zoom
-            /*
-            halfX = SCREEN_WIDTH / 2
-            halfY = SCREEN_HEIGHT / 2
-                deltaX = xPos - halfX;
-            deltaY = yPos - halfY;
-            x = halfX + deltaX * zoom + xOff;
-            y = halfY + deltaY * zoom + yOff;
-            */
-        }
+        m_viewports.erase(std::remove_if(m_viewports.begin(), m_viewports.end(),
+            [](Referencer::Viewport* viewportPtr) {
+                return viewportPtr != nullptr && !viewportPtr->isRunning();
+            }), m_viewports.end());
     }
 
     // seperation of in class funcs
@@ -297,7 +291,7 @@ namespace Referencer {
                     // pop up save current layout?
                     // destroy this instance of UIlayer and viewports
                     // new UIlayer instance
-                    
+
                 }
                 if (ImGui::MenuItem("Save", "CTRL + S"))
                 {
@@ -305,7 +299,7 @@ namespace Referencer {
                 }
                 if (ImGui::MenuItem("Open", "CTRL + O"))
                 {
-                    std::string path = loadFileDialog("Referencer file (*.ref)\0*.ref\0*.png\0*.png\0*.jpg\0*.jpg\0");
+                    std::string path = loadFileDialog("Referencer file (*.ref)\0*.ref\0*.png\0*.png\0*.jpg\0*.jpg\0*.obj\0*.obj\0");
                     if (path != "")
                     {
                         std::string name = "viewport(2D)_";
@@ -330,9 +324,9 @@ namespace Referencer {
                 if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
                 if (ImGui::MenuItem("Redo", "CTRL+Y")) {}  // Disabled item
                 ImGui::Separator();
-                if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-                if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-                if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+                if (ImGui::MenuItem("Delete", "DEL")) {}
+                if (ImGui::MenuItem("Hide", "H")) {}
+                if (ImGui::MenuItem("Duplicate", "CTRL+D")) {}
                 ImGui::EndMenu();
             }
             ImGuiIO& io = ImGui::GetIO();
@@ -345,74 +339,125 @@ namespace Referencer {
 
     void UIlayer::RenderMenu()
     {
-        
+
     }
 
     void UIlayer::RenderLayerManager()
     {
-        if (ImGui::Button("+ 2d viewport")) {
 
-            std::string name = "viewport(2D) ";
-            m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, ""));
-            m_viewportIndex++; 
-        }
-        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
-        if (ImGui::Button("+ 3d viewport")) {
-            std::string name = "viewport(3D) ";
-            m_viewports.push_back(new Viewport3D(name + std::to_string(m_viewportIndex), true));
-            m_viewportIndex++;
-        }
-
-        
-    }
-
-    void UIlayer::RenderViewports()
-    {
         ImGuiStyle& style = ImGui::GetStyle();
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 20));
-        for (int i = 0; i < m_viewports.size(); i++)
-        {
-            ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isOpened());
-        }
-        ImGui::PopStyleVar();
 
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
 
-        ImGui::Begin("Test");
+        //napad co keby som dal main window za jeden z viewportov a ked pohnes tak callback a pohnes glfw oknom aby fungoval drag&drop
+        ImGui::Begin("Layer manager", (bool*)0, flags);
         ImGui::Text("Layer names");
         ImGui::SameLine(ImGui::GetWindowWidth() - 70.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
         ImGui::Text("Visibility");
         ImGui::Separator();
-
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {style.FramePadding.x, 4 });
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { style.FramePadding.x, 4 });
 
-        
-            for (int i = 0; i < m_viewports.size(); i++)
-            {
-                //ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isSelected());
-                ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0, 0.5));
-                ImGui::Selectable(m_viewports[i]->getName().c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 23.0f));
-                ImGui::PopStyleVar();
-                
+        if (ImGui::BeginPopup("Rename")) {
+            ImGui::InputText("New Name", m_renameBuffer, IM_ARRAYSIZE(m_renameBuffer));
 
-                ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
-                //ImGui::PushStyleVar(ImGuiStyleVar_Rounding);
-                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
-                ImGui::Checkbox(("##" + std::to_string(m_viewports[i]->getID().get())).c_str(), &m_viewports[i]->isOpened());
-                ImGui::PopStyleVar();
-                ImGui::PopStyleVar();
-
+            if (ImGui::Button("OK") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
+                m_renameViewportPointer->getName() = m_renameBuffer;
+                ImGui::CloseCurrentPopup();
             }
+
+            ImGui::EndPopup();
+        }
+        for (int i = 0; i < m_viewports.size(); i++)
+        {
+            //ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isSelected());
+            ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0, 0.5));
+            ImGui::Selectable(m_viewports[i]->getName().c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 23.0f));
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+            {
+                m_renameViewportPointer = m_viewports[i];
+                ImGui::OpenPopup("Rename");
+                // problem meni sa meno a zaroven aj id takze si mysli ze nove okno eg. odznova
+            }
+            ImGui::PopStyleVar();
+
+            ImGui::SameLine(ImGui::GetWindowWidth() - 50.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
+            //ImGui::PushStyleVar(ImGuiStyleVar_Rounding);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+            ImGui::Checkbox(("##" + std::to_string(m_viewports[i]->getID().get())).c_str(), &m_viewports[i]->isOpened());
+            ImGui::PopStyleVar();
+            ImGui::PopStyleVar();
+
+        }
         ImGui::PopStyleVar();
         ImGui::PopStyleVar();
 
 
         ImGui::End();
 
+    }
 
+    void UIlayer::RenderViewports()
+    {
+        for (auto it = m_viewports.begin(); it != m_viewports.end(); it++)
+        {
+            if ((*it)->isOpened())
+                (*it)->onUpdate(m_instantOffsetX, m_instantOffsetY, 1.0f, 1.0f); // tu treba passnut offsety a zoom
 
+        }
+
+    }
+    bool UIlayer::handleDrops(DragAndDropEvent& e)
+    {
+        // funguje ale treba pridat error handling + podporu pre serializing
+        std::string endings2d[] = { "png", "webp", "jpeg", "jpg", "bmp" };
+        std::string endings3d[] = { "amf", "3ds", "ac", "ase", "assbin", "b3d", "bvh", "collada", "dxf", "csm",
+                                    "hmp", "irrmesh", "iqm", "irr", "lwo", "lws", "m3d", "md2", "md3", "md5",
+                                    "mdc", "mdl", "nff", "ndo", "off", "obj", "ogre", "opengex", "ply", "ms3d",
+                                    "dob", "blend", "ifc", "xgl", "fbx", "q3d", "q3bsp", "raw", "sib", "smd",
+                                    "stl", "terragen", "3d", "x", "x3d", "gltf", "3mf", "mmd"
+        };
+
+        const char** paths = e.getPaths();
+
+        for (int i = 0; i < e.getCount(); i++)
+        {
+            std::string path = paths[i];
+            int index = path.find_last_of('.');
+            std::string ending = path.substr(index + 1);
+
+            std::transform(ending.begin(), ending.end(), ending.begin(),
+                [](unsigned char ch) { return std::tolower(static_cast<char>(std::tolower(static_cast<unsigned char>(ch)))); });
+
+            for (std::string iter : endings2d)
+            {
+                if (iter == ending)
+                {
+                    std::string name = "viewport(2D) ";
+                    m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
+                    m_viewportIndex++;
+                    break;
+                }
+            }
+
+            for (std::string iter : endings3d)
+            {
+                if (iter == ending)
+                {
+                    std::string name = "viewport(3D) ";
+                    m_viewports.push_back(new Viewport3D(name + std::to_string(m_viewportIndex), true, path));
+                    m_viewportIndex++;
+                    break;
+                }
+            }
+
+        }
+        return true;
     }
     /*
     void UIlayer::RenderViewports()
@@ -450,7 +495,7 @@ namespace Referencer {
                     static char buffer[256];
                     ImGui::InputText("New Name", buffer, sizeof(buffer));
                     if (ImGui::Button("OK")) {
-                        
+
                         ImGui::CloseCurrentPopup();
                     }
                     ImGui::EndPopup();
@@ -471,7 +516,7 @@ namespace Referencer {
         ImGui::PopStyleVar();
 
         ImGui::End();
-        
+
 
 
     }

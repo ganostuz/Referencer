@@ -6,7 +6,7 @@ namespace Referencer {
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowMoved,
+		WindowClose, WindowResize, WindowMoved, FileDropped,
 		Keypressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};

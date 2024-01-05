@@ -11,16 +11,34 @@
 
 namespace Referencer {
 
-	Viewport3D::Viewport3D(std::string name, bool isOpen)
-		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model("D:/cube.stl"), m_first_time(true),m_scale(1.0f), m_lightColor{1.0f, 1.0f, 1.0f}, m_lightStrength(1),m_lightPos{2.0f,2.0f,2.0f}, m_objectColor{0.5f, 0.5f, 0.5f}, m_translate{ 0.0f, 0.0f, 0.0f }, m_interpolation(0.0f), m_showSettings(false)
+	Viewport3D::Viewport3D(std::string name, bool isOpen, std::string path)
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400),m_modelSource(path), m_vertex("resources/modelShader.vertex"),m_fragment("resources/modelShader.fragment"), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false)
 	{
 		genBuffers();
 		m_hasTexture = m_model.textures_loaded.size() > 0;
 	}
+	Viewport3D::Viewport3D(const Viewport3D& other)
+		: Viewport(other), m_firstMouse(true), m_width(other.m_width), m_modelSource(other.m_modelSource), m_vertex(other.m_vertex), m_fragment(other.m_fragment), m_height(other.m_height), m_shader(other.m_vertex, other.m_fragment), m_camera(other.m_camera), m_model(other.m_modelSource), m_first_time(other.m_first_time), m_scale(other.m_scale), m_lightStrength(other.m_lightStrength), m_interpolation(other.m_interpolation), m_showSettings(false)
+	{
+		m_objectColor = other.m_objectColor;
+		m_translate = other.m_translate;
+		m_lightPos = other.m_lightPos;
+		m_lightColor = other.m_lightColor;
+	}
+
+	int Viewport3D::getType()
+	{
+		return 1;
+	}
+
+	Viewport* Viewport3D::clone()
+	{
+		return new Viewport3D(*this);
+	}
 
 	void Viewport3D::handleInput()
 	{
-		
+		setSelected(true);
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 			setRunning(false);
 		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
@@ -97,7 +115,6 @@ namespace Referencer {
 		float cols[3];
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
-		std::cout << m_showSettings << std::endl;
 		if (ImGui::Begin(("Settings##" + getFullName()).c_str(), &m_showSettings, windowFlags))
 		{
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
@@ -105,14 +122,14 @@ namespace Referencer {
 			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
 				setOpened(false);
 
-			ImGui::ColorEdit3("Light color", m_lightColor);
-			ImGui::ColorEdit3("Object color", m_objectColor);
-			ImGui::SliderFloat("LightPosX", &m_lightPos[0], -10.f, 10.f, "%.2f");
-			ImGui::SliderFloat("LightPosY", &m_lightPos[1], -10.f, 10.f, "%.2f");
-			ImGui::SliderFloat("LightPosZ", &m_lightPos[2], -10.f, 10.f, "%.2f");
-			ImGui::SliderFloat("ObjectPosX", &m_translate[0], -5.f, 5.f, "%.2f");
-			ImGui::SliderFloat("ObjectPosY", &m_translate[1], -5.f, 5.f, "%.2f");
-			ImGui::SliderFloat("ObjectPosZ", &m_translate[2], -5.f, 5.f, "%.2f");
+			ImGui::ColorEdit3("Light color", &m_lightColor.x);
+			ImGui::ColorEdit3("Object color", &m_objectColor.x);
+			ImGui::SliderFloat("LightPosX", &m_lightPos.x, -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("LightPosY", &m_lightPos.y, -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("LightPosZ", &m_lightPos.z, -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosX", &m_translate.x, -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosY", &m_translate.y, -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosX", &m_translate.z, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("Scale Object", &m_scale, 0.f, 10.f, "%.3f");
 			ImGui::BeginDisabled(!m_hasTexture);
 			ImGui::SliderFloat("Material vs Texture", &m_interpolation, 0, 1.f, "%.3f");
@@ -138,9 +155,10 @@ namespace Referencer {
 		{
 			window_pos = ImGui::GetWindowPos();
 			if (ImGui::IsWindowHovered())
-			{
 				handleInput();
-			}
+			else
+				setSelected(false);
+				
 			if (m_width != ImGui::GetWindowSize().x || m_height != ImGui::GetWindowSize().y)
 			{
 				m_width = ImGui::GetWindowSize().x;
@@ -281,5 +299,7 @@ namespace Referencer {
 		m_lightPos[1] = lightPos.y;
 		m_lightPos[2] = lightPos.z;
 	}
+
+
 
 }

@@ -8,7 +8,7 @@ namespace Referencer {
         ID() : id(generateID()) {}
 
         // Copy constructor this has to be remade so that it can point to object from which it was copyed + hat its own ID
-        ID(const ID& other) : id(other.id) {}
+        ID(const ID& other) : id(generateID()) {}
 
         ID& operator=(const ID& other) {
             if (this != &other) {

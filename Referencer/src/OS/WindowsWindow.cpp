@@ -1,8 +1,10 @@
 #include "rfpch.h"
+#include <Windows.h>
 #include "WindowsWindow.h"
 #include "events\KeyEvent.h"
 #include "events\ApplicationEvents.h"
 #include "events\MouseEvent.h"
+#include "stb_image.h"
 
 namespace Referencer {
 
@@ -33,15 +35,21 @@ namespace Referencer {
 		{
 			int success = glfwInit();
 			if (!success) { std::cout << "glfw was not initialized!" << std::endl; }
-			s_GLFWInitialized = true; // todo set glfwErrorCallback
+			s_GLFWInitialized = true;
 		}
 		
-		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // vymysli alternativu alebo si urob resizing sam
-		//glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE); // ak mas proble s fps uncomment
+		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE // vymysli alternativu alebo si urob resizing sam);
+		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+		//HWND hWnd = glfwGetWin32Window(m_window);
+		//DragAcceptFiles(hWnd, TRUE);
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this
 		setVSync(true);
+		GLFWimage images[1];
+		images[0].pixels = stbi_load("resources/images/logo.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		glfwSetWindowIcon(m_window, 1, images);
+		stbi_image_free(images[0].pixels);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
@@ -150,6 +158,35 @@ namespace Referencer {
 
 			KeyTypedEvent e(character);
 			win.m_eventCallback(e);
+			});
+
+		glfwSetDropCallback(m_window, [](GLFWwindow* window, int count, const char** paths)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				/*
+				HDROP hDrop = (HDROP)glfwGetWin32Window(window);
+				if (hDrop != NULL) {
+					TCHAR szFile[MAX_PATH];
+					UINT i;
+					UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+
+					for (i = 0; i < nFiles; i++) {
+						if (DragQueryFile(hDrop, i, szFile, MAX_PATH) > 0) {
+							// Process each dropped file
+							// szFile contains the path of the dropped file
+							// Example: Print the file path
+							wprintf(L"Dropped file: %s\n", szFile);
+							glfwTerminate();
+						}
+					}
+
+					// Release the dropped files
+					DragFinish(hDrop);
+				}*/
+
+				DragAndDropEvent e(count, paths);
+				win.m_eventCallback(e);
 			});
 	}
 
