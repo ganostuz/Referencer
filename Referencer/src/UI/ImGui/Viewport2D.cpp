@@ -48,13 +48,13 @@ namespace Referencer {
 	}
 	// constructor takes name bool isOpen and sourcem image path
 	Viewport2D::Viewport2D(std::string name, bool isOpen, std::string source, int posX, int posY)
-		:Viewport(name, isOpen), m_texture(0), m_ratio(0.f), m_posX(posX), m_posY(posY)
+		:Viewport(name, isOpen), m_texture(0), m_posX(posX), m_posY(posY)
 	{
 		// TODO: will go to render
 		
 		int tempWidth, tempHeight;
 		stbi_set_flip_vertically_on_load(false);
-		unsigned char* image_data = stbi_load(source.c_str(), &tempWidth, &tempHeight, NULL, 4);
+		unsigned char* image_data = stbi_load(source.c_str(), &tempWidth, &tempHeight, NULL, 4); // ak vrate nullptr zrus vytvorenie okna to iste 3D
 		m_ratio = tempWidth / tempHeight;
 
 		// Create a OpenGL texture identifier
@@ -94,12 +94,13 @@ namespace Referencer {
 		}
 			
 		ImGui::Begin(getName().c_str(), &isRunning(), windowFlags);
+
 		
 		//idk maybe overhead
 
 		m_width = ImGui::GetWindowSize().x;
+		ImGui::SetWindowSize(ImVec2(m_width, m_width * 2));
 		m_height = ImGui::GetWindowSize().y;
-		m_ratio = m_width / m_height;
 
 		m_posX = ImGui::GetWindowPos().x;
 		m_posY = ImGui::GetWindowPos().y;

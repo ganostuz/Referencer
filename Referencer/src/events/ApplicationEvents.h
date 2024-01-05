@@ -57,4 +57,26 @@ namespace Referencer {
 		EventType getEventType() const override { return getStaticType(); }
 	};
 
+	class DragAndDropEvent : public Event
+	{
+	public:
+		DragAndDropEvent(int count, const char** paths) 
+		: m_count(count), m_paths(paths) {}
+
+		std::string ToString() const override
+		{
+			return "[ DragAndDropEvent ]";
+		}
+
+		int getCount() { return m_count; }
+		const char** getPaths() { return m_paths; }
+
+		int getEventCategory() const override { return  EventCategory::EventCategoryApplication; };
+		static EventType getStaticType() { return EventType::FileDropped; }
+		EventType getEventType() const override { return getStaticType(); }
+	private:
+		int m_count;
+		const char** m_paths;
+	};
+
 }

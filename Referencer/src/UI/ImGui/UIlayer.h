@@ -21,6 +21,7 @@ namespace Referencer {
 		int m_offsetX, m_offsetY, m_instantOffsetX, m_instantOffsetY, m_viewportIndex;
 		bool m_showMenu; 
 		
+		
 
 	public:
 		UIlayer();
@@ -45,18 +46,7 @@ namespace Referencer {
 		void RenderLayerManager();
 		void RenderViewports();
 
-		static void Drop_callback(GLFWwindow* window, int count, const char** paths) {
-			for (int i = 0; i < count; i++) {
-				// paths[i] contains the full path of the dropped file
-				// Use this path as needed in your application
-				//m_viewports.push_back(new Viewport2D(std::to_string(123) + std::to_string(m_viewportIndex), true, paths[i]));
-				//m_viewportIndex++;
-				const char* imagePath = paths[i];
-				// handle it
-				std::cout << imagePath << std::endl;
-				
-			}
-		}
+		bool handleDrops(DragAndDropEvent& e);
 
 		
 

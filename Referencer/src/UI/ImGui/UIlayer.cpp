@@ -94,8 +94,6 @@ namespace Referencer {
         //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
-        glfwSetDropCallback(window, Drop_callback);
-
     }
 
     void UIlayer::onDetach()
@@ -143,6 +141,7 @@ namespace Referencer {
         {
             m_instantZoom = 0.0f;
         }
+        
 
         // pass into it correct/instant offset
         UpdateViewports(); // deletes viewports with delete flag + updates them based on pan, zoom
@@ -156,9 +155,13 @@ namespace Referencer {
     {
         std::cout << this->getName() << e << std::endl;
         ImGuiIO& io = ImGui::GetIO();
+
+
+        EventDispatcher dispatcher(e);
+        dispatcher.dispatch<DragAndDropEvent>(std::bind(&UIlayer::handleDrops, this, std::placeholders::_1));
         
         e.setHandled((e.isInCategory(EventCategoryMouse) && io.WantCaptureMouse) ||
-            (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));
+            (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));// tu bude asii problem pokial drag and drop prejde bez toho aby bol oznaceny ako handled
     }
 
     // main private funcs
@@ -167,7 +170,7 @@ namespace Referencer {
     {
         static bool idk = true;
         ImGui_ImplOpenGL3_NewFrame();
-        glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+        //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -350,6 +353,7 @@ namespace Referencer {
 
     void UIlayer::RenderLayerManager()
     {
+
         if (ImGui::Button("+ 2d viewport")) {
 
             std::string name = "viewport(2D) ";
@@ -383,7 +387,6 @@ namespace Referencer {
         ImGui::SameLine(ImGui::GetWindowWidth() - 70.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
         ImGui::Text("Visibility");
         ImGui::Separator();
-
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {style.FramePadding.x, 4 });
 
@@ -394,7 +397,6 @@ namespace Referencer {
                 ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0, 0.5));
                 ImGui::Selectable(m_viewports[i]->getName().c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 23.0f));
                 ImGui::PopStyleVar();
-                
 
                 ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
                 //ImGui::PushStyleVar(ImGuiStyleVar_Rounding);
@@ -413,6 +415,34 @@ namespace Referencer {
 
 
 
+    }
+    bool UIlayer::handleDrops(DragAndDropEvent& e)
+    {
+        // funguje ale treba pridat error handling + podporu pre serializing
+        std::string endings[] = { "png", "webp", "jpeg", "jpg", "bmp"};
+        const char** paths = e.getPaths();
+
+        for (int i = 0; i < e.getCount(); i++)
+        {
+            std::string path = paths[i];
+            int index = path.find_last_of('.');
+            std::string ending = path.substr(index + 1);
+
+            for (std::string iter : endings)
+            {
+                if (iter == ending)
+                {
+                    std::cout << path << std::endl;
+                    std::string name = "viewport(2D) ";
+                    m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
+                    m_viewportIndex++;
+                    break;
+                }
+            }
+
+
+        }
+        return true;
     }
     /*
     void UIlayer::RenderViewports()

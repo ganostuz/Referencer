@@ -1,3 +1,6 @@
+#include "Application.h"
+#include "stb_image.h"
+//______________________________STANO____________________________
 // dear imgui: Platform Backend for GLFW
 // This needs to be used along with a Renderer (e.g. OpenGL3, Vulkan, WebGPU..)
 // (Info: GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan graphics context creation, etc.)
@@ -161,6 +164,7 @@ struct ImGui_ImplGlfw_Data
     GLFWkeyfun              PrevUserCallbackKey;
     GLFWcharfun             PrevUserCallbackChar;
     GLFWmonitorfun          PrevUserCallbackMonitor;
+    //GLFWdropfun             PrevUserCallbackDrop; // _________________STANO______________________________
 #ifdef _WIN32
     WNDPROC                 GlfwWndProc;
 #endif
@@ -474,6 +478,11 @@ void ImGui_ImplGlfw_MonitorCallback(GLFWmonitor*, int)
     ImGui_ImplGlfw_Data* bd = ImGui_ImplGlfw_GetBackendData();
     bd->WantUpdateMonitors = true;
 }
+
+//IMGUI_IMPL_API void ImGui_ImplGlfw_DropCallback(GLFWwindow* window, int count, const char** paths)
+//{
+//    return IMGUI_IMPL_API void(); //________________STANO___________________________
+//}
 
 #ifdef __EMSCRIPTEN__
 static EM_BOOL ImGui_ImplEmscripten_WheelCallback(int, const EmscriptenWheelEvent* ev, void*)
@@ -969,6 +978,7 @@ struct ImGui_ImplGlfw_ViewportData
     ~ImGui_ImplGlfw_ViewportData() { IM_ASSERT(Window == nullptr); }
 };
 
+
 static void ImGui_ImplGlfw_WindowCloseCallback(GLFWwindow* window)
 {
     if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
@@ -1017,6 +1027,12 @@ static void ImGui_ImplGlfw_CreateWindow(ImGuiViewport* viewport)
     ImGui_ImplGlfw_ViewportData* vd = IM_NEW(ImGui_ImplGlfw_ViewportData)();
     viewport->PlatformUserData = vd;
 
+    //_____________________STANO_____________________________
+    //void* idk = Referencer::Application::getApplication().getWindow();
+    //glfwSetWindowUserPointer(vd->Window, idk);
+    //viewport->PlatformUserData
+    
+
     // GLFW 3.2 unfortunately always set focus on glfwCreateWindow() if GLFW_VISIBLE is set, regardless of GLFW_FOCUSED
     // With GLFW 3.3, the hint GLFW_FOCUS_ON_SHOW fixes this problem
     glfwWindowHint(GLFW_VISIBLE, false);
@@ -1029,10 +1045,18 @@ static void ImGui_ImplGlfw_CreateWindow(ImGuiViewport* viewport)
     glfwWindowHint(GLFW_FLOATING, (viewport->Flags & ImGuiViewportFlags_TopMost) ? true : false);
 #endif
     GLFWwindow* share_window = (bd->ClientApi == GlfwClientApi_OpenGL) ? bd->Window : nullptr;
-    glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);//__________stano__________________________
+    glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);//_____________________STANO_____________________________
+
     vd->Window = glfwCreateWindow((int)viewport->Size.x, (int)viewport->Size.y, "No Title Yet", nullptr, share_window);
     vd->WindowOwned = true;
     viewport->PlatformHandle = (void*)vd->Window;
+    //_____________________STANO_____________________________
+    GLFWimage images[1];
+    stbi_set_flip_vertically_on_load(false);
+    images[0].pixels = stbi_load("resources/images/logo_child.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+    glfwSetWindowIcon(vd->Window, 1, images);
+    stbi_image_free(images[0].pixels);
+
 #ifdef _WIN32
     viewport->PlatformHandleRaw = glfwGetWin32Window(vd->Window);
 #elif defined(__APPLE__)

@@ -3,6 +3,7 @@
 #include "events\KeyEvent.h"
 #include "events\ApplicationEvents.h"
 #include "events\MouseEvent.h"
+#include "stb_image.h"
 
 namespace Referencer {
 
@@ -33,7 +34,7 @@ namespace Referencer {
 		{
 			int success = glfwInit();
 			if (!success) { std::cout << "glfw was not initialized!" << std::endl; }
-			s_GLFWInitialized = true; // todo set glfwErrorCallback
+			s_GLFWInitialized = true;
 		}
 		
 		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // vymysli alternativu alebo si urob resizing sam
@@ -42,6 +43,10 @@ namespace Referencer {
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this
 		setVSync(true);
+		GLFWimage images[1];
+		images[0].pixels = stbi_load("resources/images/logo.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		glfwSetWindowIcon(m_window, 1, images);
+		stbi_image_free(images[0].pixels);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
@@ -150,6 +155,14 @@ namespace Referencer {
 
 			KeyTypedEvent e(character);
 			win.m_eventCallback(e);
+			});
+
+		glfwSetDropCallback(m_window, [](GLFWwindow* window, int count, const char** paths)
+			{
+				WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);
+
+				DragAndDropEvent e(count, paths);
+				win.m_eventCallback(e);
 			});
 	}
 
