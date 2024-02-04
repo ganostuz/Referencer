@@ -147,6 +147,7 @@ namespace Referencer {
 		//idk maybe overhead
 
 		m_width = ImGui::GetWindowSize().x;
+		ImGui::SetWindowSize(ImVec2(m_width, m_width * 2));
 		m_height = ImGui::GetWindowSize().y;
 
 		m_posX = ImGui::GetWindowPos().x;
