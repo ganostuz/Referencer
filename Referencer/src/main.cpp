@@ -9,12 +9,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 	app->run();
 	delete app;
 }
-#endif
-
-/*
+#else
 int main(int argc, char** argv)
 {
 	Referencer::Application* app = new Referencer::Application();
 	app->run();
 	delete app;
-}*/
+}
+#endif

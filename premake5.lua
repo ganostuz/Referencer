@@ -50,7 +50,9 @@ project "Referencer"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"Referencer/vendor/assimp_build/include",
-		"%{IncludeDir.GLM}"
+		"%{IncludeDir.GLM}",
+		"Referencer/vendor/toml/toml11-master",
+		"Referencer/vendor/STB"
 	}
 	libdirs { "Referencer/vendor/assimp_build/lib/Debug"}
 	--

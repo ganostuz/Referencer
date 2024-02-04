@@ -71,9 +71,6 @@ namespace Referencer {
 			// Call your Zoom function with the mouse wheel delta
 			m_camera.Zoom(io.MouseWheel);
 		}
-
-
-
 	}
 
 
@@ -112,10 +109,10 @@ namespace Referencer {
 
 	void Viewport3D::renderImGuiModelSpecs()
 	{
-		float cols[3];
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin(("Settings##" + getFullName()).c_str(), &m_showSettings, windowFlags))
+		ImGui::SetNextWindowPos(ImVec2(ImGui::GetMousePos().x+10, ImGui::GetMousePos().y + 10), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(("###settings" + getFullName()).c_str(), &m_showSettings, windowFlags))
 		{
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 				setRunning(false);
@@ -151,7 +148,7 @@ namespace Referencer {
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollWithMouse| ImGuiWindowFlags_NoScrollbar;// todo: handle it normalne by si scrollbar ani scrolling zakazovat nemusel
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
 
-		if (ImGui::Begin(getFullName().c_str(), &isRunning(), windowFlags))
+		if (ImGui::Begin(("###"+getFullName()).c_str(), &isRunning(), windowFlags))
 		{
 			window_pos = ImGui::GetWindowPos();
 			if (ImGui::IsWindowHovered())
@@ -178,8 +175,8 @@ namespace Referencer {
 			ImGui::PopStyleVar();
 			if (ImGui::BeginPopup("my_select_popup"))
 			{
-				ImGui::MenuItem("Close 3D view", "Del", &isRunning());
-				ImGui::MenuItem("Hide 3D view", "H", &isOpened());
+				ImGui::MenuItem("Opened", "Del", &isRunning());
+				ImGui::MenuItem("Visible", "H", &isOpened());
 				ImGui::MenuItem("Show settings", "idk", &m_showSettings);
 				ImGui::EndPopup();
 			}

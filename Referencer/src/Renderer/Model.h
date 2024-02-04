@@ -46,7 +46,7 @@ namespace Referencer {
         unsigned int TextureFromFile(const char* path, const std::string& directory)
         {
             std::string filename = std::string(path);
-            filename = directory + '/' + filename;
+            filename = directory + '\\' + filename;
 
             unsigned int textureID;
             glGenTextures(1, &textureID);
@@ -87,8 +87,6 @@ namespace Referencer {
         // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
         void loadModel(std::string const& path)
         {
-            // read file via ASSIMP
-            Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
             Assimp::Importer importer;
             const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
             // check for errors
@@ -98,7 +96,7 @@ namespace Referencer {
                 return;
             }
             // retrieve the directory path of the filepath
-            directory = path.substr(0, path.find_last_of('/'));
+            directory = path.substr(0, path.find_last_of('\\'));
 
             // process ASSIMP's root node recursively
             processNode(scene->mRootNode, scene);

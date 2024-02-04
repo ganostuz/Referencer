@@ -53,6 +53,7 @@ namespace Referencer {
         style.PopupRounding = 5.0f;
         style.ScrollbarRounding = 5.0f;
 
+
         // callbacks
 
 
@@ -186,6 +187,7 @@ namespace Referencer {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         //ImGui::LoadIniSettingsFromMemory(); // from your own file
+        //ImGui::ShowDemoWindow();
 
     }
 
@@ -211,8 +213,6 @@ namespace Referencer {
     // renders components
     void UIlayer::Render()
     {
-
-        RenderMainMenu();
 
         RenderMenu();
 
@@ -346,6 +346,9 @@ namespace Referencer {
     {
 
         ImGuiStyle& style = ImGui::GetStyle();
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        
 
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
@@ -355,6 +358,8 @@ namespace Referencer {
 
         //napad co keby som dal main window za jeden z viewportov a ked pohnes tak callback a pohnes glfw oknom aby fungoval drag&drop
         ImGui::Begin("Layer manager", (bool*)0, flags);
+
+        RenderMainMenu();
         ImGui::Text("Layer names");
         ImGui::SameLine(ImGui::GetWindowWidth() - 70.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
         ImGui::Text("Visibility");
@@ -362,10 +367,13 @@ namespace Referencer {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { style.FramePadding.x, 4 });
 
+        
         if (ImGui::BeginPopup("Rename")) {
-            ImGui::InputText("New Name", m_renameBuffer, IM_ARRAYSIZE(m_renameBuffer));
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0))
+                ImGui::SetKeyboardFocusHere(0);
+                ImGui::InputText("New Name", m_renameBuffer, IM_ARRAYSIZE(m_renameBuffer), ImGuiInputTextFlags_AutoSelectAll);
 
-            if (ImGui::Button("OK") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
+            if ((ImGui::Button("OK") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) && m_renameBuffer!="") {
                 m_renameViewportPointer->getName() = m_renameBuffer;
                 ImGui::CloseCurrentPopup();
             }
@@ -376,21 +384,18 @@ namespace Referencer {
         {
             //ImGui::MenuItem(m_viewports[i]->getName().c_str(), NULL, &m_viewports[i]->isSelected());
             ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0, 0.5));
-            ImGui::Selectable(m_viewports[i]->getName().c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 23.0f));
+            ImGui::Selectable((m_viewports[i]->getName() + "###" + m_viewports[i]->getFullName()).c_str(), &m_viewports[i]->isSelected(), ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 23.0f));
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
             {
                 m_renameViewportPointer = m_viewports[i];
                 ImGui::OpenPopup("Rename");
-                // problem meni sa meno a zaroven aj id takze si mysli ze nove okno eg. odznova
             }
             ImGui::PopStyleVar();
 
             ImGui::SameLine(ImGui::GetWindowWidth() - 50.0f - ImGui::GetStyle().FramePadding.x * 2.0f);
-            //ImGui::PushStyleVar(ImGuiStyleVar_Rounding);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
-            ImGui::Checkbox(("##" + std::to_string(m_viewports[i]->getID().get())).c_str(), &m_viewports[i]->isOpened());
-            ImGui::PopStyleVar();
+
+            ImGui::Checkbox(("###" + std::to_string(m_viewports[i]->getID().get())).c_str(), &m_viewports[i]->isOpened());
             ImGui::PopStyleVar();
 
         }
@@ -399,6 +404,8 @@ namespace Referencer {
 
 
         ImGui::End();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
 
     }
 

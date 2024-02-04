@@ -39,12 +39,14 @@ namespace Referencer {
 		}
 		
 		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE // vymysli alternativu alebo si urob resizing sam);
+		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		//HWND hWnd = glfwGetWin32Window(m_window);
 		//DragAcceptFiles(hWnd, TRUE);
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this
+		glfwSetWindowSizeLimits(m_window, 300, 100, GLFW_DONT_CARE, GLFW_DONT_CARE);
 		setVSync(true);
 		GLFWimage images[1];
 		images[0].pixels = stbi_load("resources/images/logo.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
@@ -62,7 +64,12 @@ namespace Referencer {
 			{
 				std::cout << "[ GLFW ERROR ] [ " << num << " ] " << error << std::endl;
 			});
-
+		glfwSetWindowRefreshCallback(m_window, [](GLFWwindow* window)
+			{
+				//glClear(GL_COLOR_BUFFER_BIT);
+				//glfwSwapBuffers(window);
+				//glFinish();
+			});
 		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) 
 			{
 			WindowsWindow& win = *(WindowsWindow*)glfwGetWindowUserPointer(window);

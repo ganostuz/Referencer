@@ -21,7 +21,7 @@ namespace Referencer {
 		int m_offsetX, m_offsetY, m_instantOffsetX, m_instantOffsetY, m_viewportIndex;
 		bool m_showMenu, m_wasCopyed;
 
-		char m_renameBuffer[50];
+		char m_renameBuffer[30];
 		Viewport* m_renameViewportPointer;
 		
 		

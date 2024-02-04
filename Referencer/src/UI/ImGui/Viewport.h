@@ -20,7 +20,7 @@ namespace Referencer {
 		virtual Viewport* clone() = 0;
 
 		inline std::string& getName() { return m_name; }
-		inline std::string getFullName() { return m_name + std::string("##") + std::to_string(m_id.get()); }
+		inline std::string getFullName() { return m_name + std::to_string(m_id.get()); }
 		inline bool& isOpened() { return m_isOpen; }
 		inline void setOpened(bool open) { m_isOpen = open; }
 		inline bool& isRunning() { return m_running; }

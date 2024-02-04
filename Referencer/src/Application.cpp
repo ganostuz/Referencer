@@ -8,6 +8,7 @@
 #include "assimp\BaseImporter.h"
 #include "TestLayer.h"
 #include "stb_image.h"
+#include "Settings.h"
 
 namespace Referencer {
 
@@ -16,7 +17,12 @@ namespace Referencer {
 	{
 		s_instance = this;
 		m_running = true;
-		m_window = std::unique_ptr<Window>(Window::create());
+
+		Settings sett("D:/dev/toml_test/output.toml");
+		//deserialize();
+		//sett.saveSettings();
+
+		m_window = std::unique_ptr<Window>(Window::create("Referencer", 520, 240));
 		m_window->setEventCallback(std::bind(&Application::onEvent, this, std::placeholders::_1)); // vytvor nejaky define pre toto
 		//m_window->glfwSetDropCallback(window, drop_callback);
 
@@ -56,7 +62,7 @@ namespace Referencer {
 
 		while (m_running)
 		{
-			glClearColor(.2f,.2f,.2f,1.f);
+			glClearColor(.2f,.2f,.2f,0.f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			for (Layer* layer : m_layerStack)
@@ -77,6 +83,21 @@ namespace Referencer {
 	{
 		m_layerStack.pushOverlay(layer);
 		layer->onAttach();
+	}
+
+	void Application::serialize()
+	{
+		// napis settings
+		// napis main window
+		//for (Layer* layer : m_layerStack)
+		//	layer->serialize();// asi predam reference na ofstream alebo path a append
+	}
+	void Application::deserialize()
+	{
+		// load settings
+		// load main window
+		//for (Layer* layer : m_layerStack)
+		//	layer->deserialize();
 	}
 
 	bool Application::onWindowClose(WindowCloseEvent& e)

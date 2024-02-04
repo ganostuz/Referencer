@@ -10,6 +10,7 @@ namespace Referencer {
 		float m_width, m_height;
 		float m_posX, m_posY;
 		float m_zoom; // width to heigh
+		bool m_firstTimeRender;
 		unsigned int m_texture;
 		std::string m_imageSource;
 

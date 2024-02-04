@@ -19,7 +19,6 @@ namespace Referencer {
 		virtual void onDetach() {}
 		virtual void onUpdate() {}
 		virtual void onEvent(Event& event) {}
-
 		inline const std::string& getName() const { return m_name; }
 		inline const void setName(std::string name)  {  m_name = name; }
 		//inline const bool getHidden() { return m_hidden; }

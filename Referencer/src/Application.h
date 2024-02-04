@@ -19,6 +19,8 @@ namespace Referencer {
 		void pushLayer(Layer* layer);
 		void pushOverlay(Layer* layer);
 
+		void serialize();
+		void deserialize();
 		inline Window& getWindow() { return *m_window; }
 		inline static Application& getApplication() { return *s_instance; }
 

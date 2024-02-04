@@ -23,7 +23,7 @@ namespace Referencer {
 
 		virtual void* getNativeWindow() const = 0;
 
-		static Window* create(std::string title = "Referencer", unsigned int width = 1280,unsigned int height = 720);
+		static Window* create(std::string title = "Referencer", unsigned int width = 520,unsigned int height = 200);
 	};
 
 }
