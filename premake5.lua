@@ -70,6 +70,7 @@ project "Referencer"
 	filter "system:windows"
 		cppdialect "C++20"
 		systemversion "latest"
+		icon "icon.ico"
 
 		defines
 		{

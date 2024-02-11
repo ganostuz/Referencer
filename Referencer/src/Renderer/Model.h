@@ -41,6 +41,27 @@ namespace Referencer {
             for (unsigned int i = 0; i < meshes.size(); i++)
                 meshes[i].Draw(shader);
         }
+        glm::vec3 GetCenter()
+        {
+            // Initialize variables to track the minimum and maximum corners of the bounding box
+            glm::vec3 minCorner(std::numeric_limits<float>::max());
+            glm::vec3 maxCorner(std::numeric_limits<float>::lowest());
+
+            // Iterate over all meshes to find the bounding box
+            for (const auto& mesh : meshes)
+            {
+                for (const auto& vertex : mesh.vertices)
+                {
+                    minCorner = glm::min(minCorner, vertex.Position);
+                    maxCorner = glm::max(maxCorner, vertex.Position);
+                }
+            }
+
+            // Calculate the center of the bounding box
+            glm::vec3 center = (minCorner + maxCorner) / 2.0f;
+
+            return center;
+        }
 
     private:
         unsigned int TextureFromFile(const char* path, const std::string& directory)

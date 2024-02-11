@@ -10,20 +10,17 @@
 
 namespace Referencer {
 
-	const float ZOOM_SENSITIVITY = 2.0f;
+	const float ZOOM_SENSITIVITY = 10.0f;
 
 	void Viewport2D::handleInput()
 	{
 		setSelected(true);
-			
+
 
 		ImGuiIO io = ImGui::GetIO();
 		if (io.MouseWheel != 0.0f)
 		{
-			m_width = m_width * (1 + io.MouseWheel / ZOOM_SENSITIVITY);
-			m_height = m_height * (1 + io.MouseWheel / ZOOM_SENSITIVITY);
-			ImGui::SetWindowSize(ImVec2(m_width, m_height));
-
+			m_zoom = (io.MouseWheel * ZOOM_SENSITIVITY);
 		}
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 			setRunning(false);
@@ -44,7 +41,7 @@ namespace Referencer {
 			ImGui::EndPopup();
 		}
 
-		if (ImGui::BeginPopup("ColorPopup")) 
+		if (ImGui::BeginPopup("ColorPopup"))
 		{
 			static ImVec4 bgColor = ImVec4(0.3f, 0.5f, 0.7f, 1.0f); // Initial background color temp
 
@@ -71,42 +68,18 @@ namespace Referencer {
 
 	}
 	// constructor takes name bool isOpen and sourcem image path
-	Viewport2D::Viewport2D(std::string name, bool isOpen, std::string source, int posX, int posY)
-		:Viewport(name, isOpen), m_texture(0), m_posX(posX), m_posY(posY), m_imageSource(source), m_firstTimeRender(true)
+	Viewport2D::Viewport2D(std::string name, bool isOpen, std::string source, int posX, int posY, std::shared_ptr<ImageData> image)
+		:Viewport(name, isOpen), m_texture(0), m_posX(posX), m_posY(posY), m_imageSource(source), m_zoom(0.0f), m_image(image)
 	{
 		// TODO: popripade mozes nechat nacitany obrazok do pamate
-		
-		int tempWidth, tempHeight;
-		stbi_set_flip_vertically_on_load(false);
-		unsigned char* image_data = stbi_load(source.c_str(), &tempWidth, &tempHeight, NULL, 4); // ak vrate nullptr zrus vytvorenie okna to iste 3D
-		m_width = tempWidth;
-		m_height = tempHeight;
-		// Create a OpenGL texture identifier
-		glGenTextures(1, &m_texture);
-		glBindTexture(GL_TEXTURE_2D, m_texture);
-
-		// Setup filtering parameters for display
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
-
-		// Upload pixels into texture
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tempWidth, tempHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-		if (image_data)
+		if (m_image == nullptr)
 		{
-			stbi_image_free(image_data);
+			m_image = std::make_shared<ImageData>();
+			stbi_set_flip_vertically_on_load(false);
+			m_image->pixels = stbi_load(source.c_str(), &m_image->width, &m_image->height, NULL, 4); // ak vrate nullptr zrus vytvorenie okna to iste 3D
 		}
-		// above to render
-	}
-	Viewport2D::Viewport2D(const Viewport2D& other)
-		:Viewport(other), m_texture(0), m_posX(other.m_posX+10), m_posY(other.m_posY + 10), m_imageSource(other.m_imageSource), m_firstTimeRender(other.m_firstTimeRender)
-	{
-		int tempWidth, tempHeight;
-		stbi_set_flip_vertically_on_load(false);
-		unsigned char* image_data = stbi_load(m_imageSource.c_str(), &tempWidth, &tempHeight, NULL, 4); // ak vrate nullptr zrus vytvorenie okna to iste 3D
-		m_width = tempWidth;
-		m_height = tempHeight;
+		m_width = m_image->width;
+		m_height = m_image->height;
 		// Create a OpenGL texture identifier
 		glGenTextures(1, &m_texture);
 		glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -118,17 +91,37 @@ namespace Referencer {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		// Upload pixels into texture
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tempWidth, tempHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-		if (image_data)
-		{
-			stbi_image_free(image_data);
-		}
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (*m_image).width, (*m_image).height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (*m_image).pixels);
+		// above to render
+	}
+	Viewport2D::Viewport2D(const Viewport2D& other)
+		: Viewport(other), m_texture(0), m_posX(other.m_posX + 10), m_posY(other.m_posY + 10), m_imageSource(other.m_imageSource), m_width(other.m_width), m_height(other.m_height), m_zoom(other.m_zoom)
+	{
+		// Create a new ImageData object with a copy of the pixel data
+		m_image = std::make_shared<ImageData>(*other.m_image);
+		// Initialize OpenGL texture
+		glGenTextures(1, &m_texture);
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+
+		// Setup filtering parameters for display
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		// Upload pixels into texture
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image->width, m_image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image->pixels);
+	}
+	Viewport2D::~Viewport2D()
+	{
+		glDeleteTextures(1, &m_texture);
 	}
 	// function called every frame
 	void Viewport2D::onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom)
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(.0f, .0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		
 
 		// toto asi netreba
 		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
@@ -138,35 +131,53 @@ namespace Referencer {
 		{
 			pan(offsetX, offsetY);
 		}
-		if (m_firstTimeRender)
-			ImGui::SetNextWindowSize({ m_width/2, m_height/2 }, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize({ m_width / 2, m_height / 2 }, ImGuiCond_FirstUseEver);
 
-		ImGui::Begin(getFullName().c_str(), &isRunning(), windowFlags);
+		if (m_zoom != 0.0f)
+		{
+			// prv resiznut podla minuleho framu nasledne prijat dalsi input
+			ImGui::SetNextWindowPos({ m_posX - m_zoom / 2, m_posY - m_zoom / 2 });
+			ImGui::SetNextWindowSize({ m_width + m_zoom, m_height + m_zoom });
+
+			m_zoom = 0.0f;
+		}
 
 		
-		//idk maybe overhead
 
-		m_width = ImGui::GetWindowSize().x;
-		ImGui::SetWindowSize(ImVec2(m_width, m_width * 2));
-		m_height = ImGui::GetWindowSize().y;
+		if (ImGui::Begin(("###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
+		{
+			m_width = ImGui::GetWindowSize().x;
+			m_height = ImGui::GetWindowSize().y;
 
-		m_posX = ImGui::GetWindowPos().x;
-		m_posY = ImGui::GetWindowPos().y;
+			m_posX = ImGui::GetWindowPos().x;
+			m_posY = ImGui::GetWindowPos().y;
 
-		if (ImGui::IsWindowHovered())
-			handleInput();
-		else
-			setSelected(false);
-		// will go to render
-		
+			if (ImGui::IsWindowHovered())
+				handleInput();
+			else
+				setSelected(false);
+			// will go to render
 
-		ImGui::Image((void*)(intptr_t)m_texture, ImVec2(m_width, m_height));
+			ImGuiIO io = ImGui::GetIO();
+			if (ImGui::IsKeyDown(ImGuiKey_MouseRight) && ImGui::IsWindowHovered())
+				ImGui::OpenPopup("my_select_popup");
+
+			if (ImGui::BeginPopup("my_select_popup"))
+			{
+				ImGui::MenuItem("Opened", "Del", &isRunning());
+				ImGui::MenuItem("Visible", "H", &isOpened());
+				ImGui::EndPopup();
+			}
+
+			ImGui::Image((void*)(intptr_t)m_texture, ImVec2(m_width, m_height));
+		}
+
 		ImGui::End();
 
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar();
+		ImGui::PopStyleVar(2);
 
-		m_firstTimeRender = false;
+		
+
 	}
 	//event handler
 	void Viewport2D::onEvent(Event& e)
@@ -181,6 +192,15 @@ namespace Referencer {
 	Viewport* Viewport2D::clone()
 	{
 		return new Viewport2D(*this);
+	}
+	void Viewport2D::SerializeImage(std::ostream& os) const {
+		// Write the width and height
+
+		os.write(reinterpret_cast<char*>(&this->m_image->width), sizeof(this->m_image->width));
+		os.write(reinterpret_cast<char*>(&this->m_image->height), sizeof(this->m_image->height));
+
+		// Write the pixel data // unsigned?
+		os.write(reinterpret_cast<char*>(this->m_image->pixels), this->m_image->width * this->m_image->height * 4); // Assuming  4 bytes per pixel (RGBA)
 	}
 
 }

@@ -199,8 +199,6 @@ namespace Referencer {
 
 	void WindowsWindow::onUpdate()
 	{
-		
-
 		glfwPollEvents();
 		glfwSwapBuffers(m_window);
 	}

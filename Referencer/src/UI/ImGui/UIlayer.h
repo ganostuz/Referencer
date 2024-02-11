@@ -19,13 +19,10 @@ namespace Referencer {
 		std::vector<Viewport*> m_viewports;
 		float m_zoom, m_instantZoom;
 		int m_offsetX, m_offsetY, m_instantOffsetX, m_instantOffsetY, m_viewportIndex;
-		bool m_showMenu, m_wasCopyed;
+		bool m_showMenu, m_wasCopyed, m_showSettings;
 
 		char m_renameBuffer[30];
 		Viewport* m_renameViewportPointer;
-		
-		
-		
 
 	public:
 		UIlayer();
@@ -35,6 +32,7 @@ namespace Referencer {
 		void onDetach();
 		void onUpdate();
 		void onEvent(Event& e);
+		void serialize(toml::value& config);
 
 	private:
 
@@ -42,13 +40,18 @@ namespace Referencer {
 		void End();
 		void Render();
 		void UpdateViewports();
+
 		std::string saveFileDialog(const char* filter);
 		std::string loadFileDialog(const char* filter);
+
+		void LoadSettingsToImGui(const SettingsHolder& settings);
+		void SaveImGuiToSettings(SettingsHolder& settings);
 
 		void RenderMainMenu();
 		void RenderMenu();
 		void RenderLayerManager();
 		void RenderViewports();
+		void ShowGlobalSettingsEditor();
 
 		bool handleDrops(DragAndDropEvent& e);
 

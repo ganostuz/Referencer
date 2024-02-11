@@ -24,7 +24,7 @@ namespace Referencer {
 		std::string m_vertex, m_fragment, m_modelSource;
 		//light, color, material settings
 		float m_lightStrength, m_scale, m_interpolation;
-		glm::vec3 m_objectColor, m_lightColor, m_lightPos, m_translate;
+		glm::vec3 m_objectColor, m_lightColor, m_lightPos, m_translate, m_center;
 		
 
 		void handleInput(); // uses imgui events so must be in imgui context

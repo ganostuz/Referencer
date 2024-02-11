@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "events\ApplicationEvents.h"
 #include "LayerStack.h"
+#include "Settings.h"
 
 
 namespace Referencer {
@@ -23,8 +24,10 @@ namespace Referencer {
 		void deserialize();
 		inline Window& getWindow() { return *m_window; }
 		inline static Application& getApplication() { return *s_instance; }
+		inline SettingsHolder& getSettings() { return m_settings.getSettings(); }
 
 	private:
+		Settings m_settings;
 		LayerStack m_layerStack;
 		std::unique_ptr<Window> m_window;
 		bool m_running;

@@ -12,20 +12,33 @@
 #include "GLFW\glfw3native.h"
 #include "backends\imgui_impl_glfw.h"
 
-
+#define IMGUI_COLOR_FROM_GLMVEC4(color) ImVec4((color).x, (color).y, (color).z, (color).w)
+#define ImVec4ToGlmVec4(color) glm::vec4((color).x, (color).y, (color).z, (color).w)
 
 //#include "ImGui\imgui_impl_glfw.h"
 
 namespace Referencer {
 
     UIlayer::UIlayer()
-        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f), m_viewportIndex(1), m_wasCopyed(false), m_renameBuffer(""), m_renameViewportPointer(nullptr)
+        : Layer("ImGui layer"), m_showMenu(true), m_zoom(1.0f), m_offsetX(0), m_offsetY(0), m_instantOffsetX(0), m_instantOffsetY(0), m_instantZoom(1.0f), m_viewportIndex(1), m_wasCopyed(false), m_renameBuffer(""), m_renameViewportPointer(nullptr), m_showSettings(false)
     {
     }
 
 
     UIlayer::~UIlayer()
     {
+        std::ofstream file("D:/dev/uloz.Ref", std::ios::binary);
+        for (int i = 0; i < m_viewports.size(); ++i)
+        {
+            Viewport2D* viewport2DPtr = dynamic_cast<Viewport2D*>(m_viewports[i]);
+            if (viewport2DPtr != nullptr) {
+                // Successfully cast to Viewport2D, handle accordingly
+                viewport2DPtr->SerializeImage(file);
+                continue;
+            }
+
+            
+        }
         onDetach();
     }
 
@@ -35,6 +48,10 @@ namespace Referencer {
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+        Application& app = Application::getApplication();
+        SettingsHolder& settings = app.getSettings();
+        GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
+
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
@@ -42,55 +59,8 @@ namespace Referencer {
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
 
-        ImGuiStyle& style = ImGui::GetStyle();
-
-        style.WindowRounding = 5.0f;
-        style.ChildRounding = 5.0f;
-        style.FrameRounding = 5.0f;
-        style.GrabRounding = 5.0f;
-        style.PopupRounding = 5.0f;
-        style.ScrollbarRounding = 5.0f;
-
-
-        // callbacks
-
-
-
-        //colors
-        auto& colors = ImGui::GetStyle().Colors;
-        colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
-
-        // Headers
-        colors[ImGuiCol_Header] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
-        colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
-        colors[ImGuiCol_HeaderActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-
-        // Buttons
-        colors[ImGuiCol_Button] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
-        colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
-        colors[ImGuiCol_ButtonActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-
-        // Frame BG
-        colors[ImGuiCol_FrameBg] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
-        colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
-        colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-
-        // Tabs
-        colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-        colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.3805f, 0.381f, 1.0f };
-        colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.2805f, 0.281f, 1.0f };
-        colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-        colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
-
-        // Title
-        colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-        colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-
-        Application& app = Application::getApplication();
-        GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
+        LoadSettingsToImGui(settings);
 
         // Setup Platform/Renderer bindings
         // Setup Platform/Renderer backends
@@ -177,6 +147,15 @@ namespace Referencer {
             (e.isInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard));// tu bude asii problem pokial drag and drop prejde bez toho aby bol oznaceny ako handled
     }
 
+    void UIlayer::serialize(toml::value& config)
+    {
+        for (int i = 0; i < m_viewports.size(); ++i)
+        {
+            //m_viewports[i]->serialize(config);
+        }
+
+    }
+
     // main private funcs
     // begins new frame
     void UIlayer::Begin()
@@ -215,6 +194,8 @@ namespace Referencer {
     {
 
         RenderMenu();
+
+        ShowGlobalSettingsEditor(); // rename to render
 
         RenderLayerManager();
 
@@ -276,6 +257,71 @@ namespace Referencer {
         return std::string();
     }
 
+    void UIlayer::LoadSettingsToImGui(const SettingsHolder& settings)
+    {
+
+        // Setup Dear ImGui style
+        //ImGui::StyleColorsDark();
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        // toto popjde do global configu
+        style.WindowRounding = 5.0f;
+        style.ChildRounding = 5.0f;
+        style.FrameRounding = 5.0f;
+        style.GrabRounding = 5.0f;
+        style.PopupRounding = 5.0f;
+        style.ScrollbarRounding = 5.0f;
+
+        auto& colors = ImGui::GetStyle().Colors;
+        colors[ImGuiCol_WindowBg] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_WindowBg);
+
+        // Headers
+        colors[ImGuiCol_Header] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_Header);
+        colors[ImGuiCol_HeaderHovered] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_HeaderHovered);
+        colors[ImGuiCol_HeaderActive] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_HeaderActive);
+
+        // Buttons
+        colors[ImGuiCol_Button] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_Button);
+        colors[ImGuiCol_ButtonHovered] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_ButtonHovered);
+        colors[ImGuiCol_ButtonActive] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_ButtonActive);
+
+        // Frame BG
+        colors[ImGuiCol_FrameBg] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_FrameBg);
+        colors[ImGuiCol_FrameBgHovered] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_FrameBgHovered);
+        colors[ImGuiCol_FrameBgActive] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_FrameBgActive);
+
+        // Tabs
+        //colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+        //colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.3805f, 0.381f, 1.0f };
+        //colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.2805f, 0.281f, 1.0f };
+        //colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+        //colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+
+        // Title
+        colors[ImGuiCol_TitleBg] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_TitleBg);
+        colors[ImGuiCol_TitleBgActive] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_TitleBgActive);
+        colors[ImGuiCol_TitleBgCollapsed] = IMGUI_COLOR_FROM_GLMVEC4(settings.ImGuiCol_TitleBgCollapsed);
+    }
+
+    void UIlayer::SaveImGuiToSettings(SettingsHolder& settings)
+    {
+        const ImGuiStyle& style = ImGui::GetStyle();
+
+        settings.ImGuiCol_WindowBg = ImVec4ToGlmVec4(style.Colors[ImGuiCol_WindowBg]);
+        settings.ImGuiCol_Header = ImVec4ToGlmVec4(style.Colors[ImGuiCol_Header]);
+        settings.ImGuiCol_HeaderHovered = ImVec4ToGlmVec4(style.Colors[ImGuiCol_HeaderHovered]);
+        settings.ImGuiCol_HeaderActive = ImVec4ToGlmVec4(style.Colors[ImGuiCol_HeaderActive]);
+        settings.ImGuiCol_Button = ImVec4ToGlmVec4(style.Colors[ImGuiCol_Button]);
+        settings.ImGuiCol_ButtonHovered = ImVec4ToGlmVec4(style.Colors[ImGuiCol_ButtonHovered]);
+        settings.ImGuiCol_ButtonActive = ImVec4ToGlmVec4(style.Colors[ImGuiCol_ButtonActive]);
+        settings.ImGuiCol_FrameBg = ImVec4ToGlmVec4(style.Colors[ImGuiCol_FrameBg]);
+        settings.ImGuiCol_FrameBgHovered = ImVec4ToGlmVec4(style.Colors[ImGuiCol_FrameBgHovered]);
+        settings.ImGuiCol_FrameBgActive = ImVec4ToGlmVec4(style.Colors[ImGuiCol_FrameBgActive]);
+        settings.ImGuiCol_TitleBg = ImVec4ToGlmVec4(style.Colors[ImGuiCol_TitleBg]);
+        settings.ImGuiCol_TitleBgActive = ImVec4ToGlmVec4(style.Colors[ImGuiCol_TitleBgActive]);
+        settings.ImGuiCol_TitleBgCollapsed = ImVec4ToGlmVec4(style.Colors[ImGuiCol_TitleBgCollapsed]);
+    }
+
     void UIlayer::RenderMainMenu()
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, .0f);
@@ -284,7 +330,7 @@ namespace Referencer {
         {
             if (ImGui::BeginMenu("File"))
             {
-                ImGui::VSliderFloat("idk", ImVec2(200, 200), &m_zoom, 0.0f, 10.0f);
+                //ImGui::VSliderFloat("idk", ImVec2(200, 200), &m_zoom, 0.0f, 10.0f);
                 if (ImGui::MenuItem("New", "CTRL + N"))
                 {
                     // Handle menu item click
@@ -297,6 +343,7 @@ namespace Referencer {
                 {
                     // take path from memory and save here
                 }
+
                 if (ImGui::MenuItem("Open", "CTRL + O"))
                 {
                     std::string path = loadFileDialog("Referencer file (*.ref)\0*.ref\0*.png\0*.png\0*.jpg\0*.jpg\0*.obj\0*.obj\0");
@@ -304,7 +351,18 @@ namespace Referencer {
                     {
                         std::string name = "viewport(2D)_";
                         m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
+                        try
+                        {
+                        std::filesystem::create_symlink(path, "D:\\dev\\" + m_viewports[m_viewportIndex-1]->getID().get());
+
+                        }
+                        catch (const std::exception& e)
+                        {
+                            std::string idk = e.what();
+                        }
                         m_viewportIndex++;
+                        
+                        
                         //m_selected.push_back(false);
                     }
                 }
@@ -316,6 +374,7 @@ namespace Referencer {
                         // save file
                     }
                 }
+                ImGui::MenuItem("Show settings", NULL, &m_showSettings);
 
                 ImGui::EndMenu();
             }
@@ -339,7 +398,7 @@ namespace Referencer {
 
     void UIlayer::RenderMenu()
     {
-
+        //ImGui::ShowDemoWindow((bool *)true);
     }
 
     void UIlayer::RenderLayerManager()
@@ -415,9 +474,46 @@ namespace Referencer {
         {
             if ((*it)->isOpened())
                 (*it)->onUpdate(m_instantOffsetX, m_instantOffsetY, 1.0f, 1.0f); // tu treba passnut offsety a zoom
-
         }
 
+    }
+    void UIlayer::ShowGlobalSettingsEditor() {
+        if (!m_showSettings)
+            return;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(400, 300));
+        ImGui::Begin("Global Settings Editor", &m_showSettings, ImGuiWindowFlags_NoSavedSettings);
+
+        // Create a local reference to ImGui's style
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        // ImGui colors
+        ImGui::Text("ImGui Colors");
+        ImGui::ColorEdit4("Window Bg", (float*)&style.Colors[ImGuiCol_WindowBg], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Header", (float*)&style.Colors[ImGuiCol_Header], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Header Hovered", (float*)&style.Colors[ImGuiCol_HeaderHovered], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Header Active", (float*)&style.Colors[ImGuiCol_HeaderActive], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Button", (float*)&style.Colors[ImGuiCol_Button], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Button Hovered", (float*)&style.Colors[ImGuiCol_ButtonHovered], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Button Active", (float*)&style.Colors[ImGuiCol_ButtonActive], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Frame Bg", (float*)&style.Colors[ImGuiCol_FrameBg], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Frame Bg Hovered", (float*)&style.Colors[ImGuiCol_FrameBgHovered], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Frame Bg Active", (float*)&style.Colors[ImGuiCol_FrameBgActive], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Title Bg", (float*)&style.Colors[ImGuiCol_TitleBg], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Title Bg Active", (float*)&style.Colors[ImGuiCol_TitleBgActive], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Title Bg Collapsed", (float*)&style.Colors[ImGuiCol_TitleBgCollapsed], ImGuiColorEditFlags_Float);
+
+        if (ImGui::Button("Save"))
+        {
+            SaveImGuiToSettings(Application::getApplication().getSettings());
+        }
+        ImGui::SameLine(50.0f);
+        if (ImGui::Button("Load saved"))
+        {
+            LoadSettingsToImGui(Application::getApplication().getSettings());
+        }
+        ImGui::End();
+        ImGui::PopStyleVar();
     }
     bool UIlayer::handleDrops(DragAndDropEvent& e)
     {
@@ -441,12 +537,61 @@ namespace Referencer {
             std::transform(ending.begin(), ending.end(), ending.begin(),
                 [](unsigned char ch) { return std::tolower(static_cast<char>(std::tolower(static_cast<unsigned char>(ch)))); });
 
+            if (ending == "ref")
+            {
+                std::ifstream file(path, std::ios::binary);
+                if (!file) { // ma to problem s utf 8
+                    std::cerr << "Error opening file: " << path << std::endl;
+                    return {};
+                }
+
+                int width, height;
+
+                while (true) {
+                    // Read the width and height
+                    if (!file.read(reinterpret_cast<char*>(&width), sizeof(width))) break;
+                    if (!file.read(reinterpret_cast<char*>(&height), sizeof(height))) break;
+
+                    // Allocate memory for the image data
+                    unsigned char* pixels = new unsigned char[width * height * 4]; // Assuming  4 bytes per pixel (RGBA)
+
+                    // Read the pixel data
+                    if (!file.read(reinterpret_cast<char*>(pixels), width * height * 4)) {
+                        delete[] pixels; // Free the allocated memory if reading fails
+                        break;
+                    }
+
+                    // Create a new ImageData instance
+                    std::shared_ptr<ImageData> imgData = std::make_shared<ImageData>(width, height, pixels);
+
+                    // Create a new Viewport2D instance
+                    std::string name = "viewport(2D) ";
+                    m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path,10,10,imgData));
+
+                    ++m_viewportIndex;
+                }
+            }
+
             for (std::string iter : endings2d)
             {
                 if (iter == ending)
                 {
                     std::string name = "viewport(2D) ";
                     m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
+                    try
+                    {
+                        std::filesystem::path dirPath = "D:\\dev\\temp\\";
+                        std::string viewportId = std::to_string(m_viewports[m_viewports.size() - 1]->getID().get());
+                        std::filesystem::path fullPath = dirPath / viewportId;
+                        std::filesystem::create_symlink(path, fullPath);
+
+                    }
+                    catch (const std::exception& e)
+                    {
+                        std::string idk = e.what();
+                        //error handling
+                    }
+
                     m_viewportIndex++;
                     break;
                 }
@@ -458,6 +603,19 @@ namespace Referencer {
                 {
                     std::string name = "viewport(3D) ";
                     m_viewports.push_back(new Viewport3D(name + std::to_string(m_viewportIndex), true, path));
+                    try
+                    {
+                        std::filesystem::path dirPath = "D:\\dev\\temp\\";
+                        std::string viewportId = std::to_string(m_viewports[m_viewports.size() - 1]->getID().get());
+                        std::filesystem::path fullPath = dirPath / viewportId;
+                        std::filesystem::create_symlink(path, fullPath);
+
+                    }
+                    catch (const std::exception& e)
+                    {
+                        std::string idk = e.what();
+                        //error handling
+                    }
                     m_viewportIndex++;
                     break;
                 }

@@ -61,7 +61,7 @@ namespace Referencer {
 			//error handling, app is throwing exceptions when type or count is wrong
 			const auto data = toml::parse(m_settingsPath);
 			const auto& config = toml::find(data, "global_config");
-
+			// mozes skusit aj cez find_or
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_WindowBg")), m_Settings.ImGuiCol_WindowBg);
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_Header")), m_Settings.ImGuiCol_Header);
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_HeaderHovered")), m_Settings.ImGuiCol_HeaderHovered);
@@ -75,6 +75,7 @@ namespace Referencer {
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_TitleBg")), m_Settings.ImGuiCol_TitleBg);
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_TitleBgActive")), m_Settings.ImGuiCol_TitleBgActive);
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_TitleBgCollapsed")), m_Settings.ImGuiCol_TitleBgCollapsed);
+			//std::string title = toml::find<std::string>(data, "saveDir");
 		}
 			
 	}
@@ -85,7 +86,8 @@ namespace Referencer {
 		{
 			if (m_settingsPath == "")
 			{
-				// assert no valid path use local 
+				// assert no valid path use local
+				m_settingsPath = "D:\\dev\\temp";
 			}
 			settingsPath = m_settingsPath;
 		}

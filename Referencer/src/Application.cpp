@@ -8,17 +8,17 @@
 #include "assimp\BaseImporter.h"
 #include "TestLayer.h"
 #include "stb_image.h"
-#include "Settings.h"
+
 
 namespace Referencer {
 
 	Application* Application::s_instance = nullptr;
 	Application::Application()
+		: m_settings("D:/dev/toml_test/global_config.toml") 
 	{
 		s_instance = this;
 		m_running = true;
-
-		Settings sett("D:/dev/toml_test/output.toml");
+		// sprav ze pri loading bude ocakavat config jeden dir vyssie ak nie fallback to global
 		//deserialize();
 		//sett.saveSettings();
 
@@ -69,8 +69,9 @@ namespace Referencer {
 				layer->onUpdate();
 
 			m_window->onUpdate();
-
 		}
+		// toto asi pojde vsetko este inde
+		//this->serialize();
 	}
 
 	void Application::pushLayer(Layer* layer)
@@ -87,6 +88,24 @@ namespace Referencer {
 
 	void Application::serialize()
 	{
+		m_settings.saveSettings();
+		toml::value v;
+		v["Application"]["theme"] = "dark";
+		v["Application"]["font_size"] = 12.0;
+		for (Layer* layer : m_layerStack)
+			layer->serialize(v);
+		std::ofstream file("D:\\dev\\temp\\temp.toml");
+		if (file.is_open()) 
+		{
+			file << std::setw(80) << v;
+			file.close();
+		}
+		else
+		{
+			//assert
+		}
+
+
 		// napis settings
 		// napis main window
 		//for (Layer* layer : m_layerStack)

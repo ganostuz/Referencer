@@ -16,6 +16,7 @@ namespace Referencer {
 	{
 		genBuffers();
 		m_hasTexture = m_model.textures_loaded.size() > 0;
+		m_center = m_model.GetCenter();
 	}
 	Viewport3D::Viewport3D(const Viewport3D& other)
 		: Viewport(other), m_firstMouse(true), m_width(other.m_width), m_modelSource(other.m_modelSource), m_vertex(other.m_vertex), m_fragment(other.m_fragment), m_height(other.m_height), m_shader(other.m_vertex, other.m_fragment), m_camera(other.m_camera), m_model(other.m_modelSource), m_first_time(other.m_first_time), m_scale(other.m_scale), m_lightStrength(other.m_lightStrength), m_interpolation(other.m_interpolation), m_showSettings(false)
@@ -24,6 +25,7 @@ namespace Referencer {
 		m_translate = other.m_translate;
 		m_lightPos = other.m_lightPos;
 		m_lightColor = other.m_lightColor;
+		m_center = other.m_center;
 	}
 
 	int Viewport3D::getType()
@@ -126,7 +128,7 @@ namespace Referencer {
 			ImGui::SliderFloat("LightPosZ", &m_lightPos.z, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("ObjectPosX", &m_translate.x, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("ObjectPosY", &m_translate.y, -10.f, 10.f, "%.2f");
-			ImGui::SliderFloat("ObjectPosX", &m_translate.z, -10.f, 10.f, "%.2f");
+			ImGui::SliderFloat("ObjectPosZ", &m_translate.z, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("Scale Object", &m_scale, 0.f, 10.f, "%.3f");
 			ImGui::BeginDisabled(!m_hasTexture);
 			ImGui::SliderFloat("Material vs Texture", &m_interpolation, 0, 1.f, "%.3f");
@@ -148,7 +150,7 @@ namespace Referencer {
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollWithMouse| ImGuiWindowFlags_NoScrollbar;// todo: handle it normalne by si scrollbar ani scrolling zakazovat nemusel
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
 
-		if (ImGui::Begin(("###"+getFullName()).c_str(), &isRunning(), windowFlags))
+		if (ImGui::Begin(("###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
 		{
 			window_pos = ImGui::GetWindowPos();
 			if (ImGui::IsWindowHovered())
@@ -222,31 +224,8 @@ namespace Referencer {
 
 		// render the loaded model
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(m_translate[0], m_translate[1], m_translate[2])); // translate it down so it's at the center of the scene todo: leftmost & rightmost then center for all verticies
-
-		/*  //example
-		    glm::vec3 minCoords(FLT_MAX);
-			glm::vec3 maxCoords(-FLT_MAX);
-
-			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-			    aiVector3D vertex = mesh->mVertices[i];
-			    minCoords.x = std::min(minCoords.x, vertex.x);
-			    minCoords.y = std::min(minCoords.y, vertex.y);
-			    minCoords.z = std::min(minCoords.z, vertex.z);
-			    maxCoords.x = std::max(maxCoords.x, vertex.x);
-			    maxCoords.y = std::max(maxCoords.y, vertex.y);
-			    maxCoords.z = std::max(maxCoords.z, vertex.z);
-			}
-
-			glm::vec3 center = (minCoords + maxCoords) * 0.5f;
-
-			// Translate the model to center it
-			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-				mesh->mVertices[i] -= center;
-    }
-		
-		
-		*/
+		model = glm::translate(model, -m_center);
+		model = glm::translate(model, glm::vec3(m_translate[0], m_translate[1], m_translate[2])); // translate it down
 		model = glm::scale(model, glm::vec3(m_scale));	// it's a bit too big for our scene, so scale it down
 		m_shader.setMat4("model", model);
 		m_model.Draw(m_shader);
