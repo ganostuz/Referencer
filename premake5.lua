@@ -16,6 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Referencer/vendor/GLFW/include"
 IncludeDir["Glad"] = "Referencer/vendor/Glad/include"
 IncludeDir["ImGui"] = "Referencer/vendor/imGui"
+--IncludeDir["libCURL"] = "Referencer/vendor/curl"
 --IncludeDir["assimp"] = "Referencer/vendor/assimp/include/"
 --IncludeDir["assimp"] = "Referencer/vendor/assimp_build/include"
 IncludeDir["GLM"] = "Referencer/vendor/glm/"
@@ -23,6 +24,7 @@ IncludeDir["GLM"] = "Referencer/vendor/glm/"
 include "Referencer/vendor/GLFW"
 include "Referencer/vendor/Glad"
 include "Referencer/vendor/imGui"
+--include "Referencer/vendor/curl"
 --include "Referencer/vendor/assimp_build" 
 include "Referencer/vendor/glm"
 
@@ -52,7 +54,8 @@ project "Referencer"
 		"Referencer/vendor/assimp_build/include",
 		"%{IncludeDir.GLM}",
 		"Referencer/vendor/toml/toml11-master",
-		"Referencer/vendor/STB"
+		"Referencer/vendor/STB",
+		--"%{IncludeDir.libCURL}",
 	}
 	libdirs { "Referencer/vendor/assimp_build/lib/Debug"}
 	--
@@ -64,7 +67,8 @@ project "Referencer"
 		"opengl32.lib",
 		"GLM",
 		"assimp-vc143-mtd.lib",
-		"zlibstaticd.lib"
+		"zlibstaticd.lib",
+		--"libCURL"
 	}
 
 	filter "system:windows"

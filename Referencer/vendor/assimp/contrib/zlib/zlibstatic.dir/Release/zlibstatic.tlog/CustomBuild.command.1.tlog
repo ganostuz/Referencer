@@ -1,0 +1,10 @@
+^C:\USERS\GUZST\DOWNLOADS\ASSIMP\ASSIMP-5.3.1\CONTRIB\ZLIB\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/guzst/Downloads/assimp/assimp-5.3.1 -BC:/Users/guzst/Downloads/assimp/release --check-stamp-file C:/Users/guzst/Downloads/assimp/release/contrib/zlib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

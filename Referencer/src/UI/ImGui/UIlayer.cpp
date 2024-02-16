@@ -27,18 +27,7 @@ namespace Referencer {
 
     UIlayer::~UIlayer()
     {
-        std::ofstream file("D:/dev/uloz.Ref", std::ios::binary);
-        for (int i = 0; i < m_viewports.size(); ++i)
-        {
-            Viewport2D* viewport2DPtr = dynamic_cast<Viewport2D*>(m_viewports[i]);
-            if (viewport2DPtr != nullptr) {
-                // Successfully cast to Viewport2D, handle accordingly
-                viewport2DPtr->SerializeImage(file);
-                continue;
-            }
-
-            
-        }
+        
         onDetach();
     }
 
@@ -67,6 +56,9 @@ namespace Referencer {
         //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
+
+        io.Fonts->AddFontFromFileTTF("D:/dev/Referencer/Referencer/resources/fonts/Roboto-Medium.ttf", 15.0f);
+        //ImFont* font1 = io.Fonts->AddFontFromFileTTF("font.ttf", size_pixels);
     }
 
     void UIlayer::onDetach()
@@ -333,20 +325,14 @@ namespace Referencer {
                 //ImGui::VSliderFloat("idk", ImVec2(200, 200), &m_zoom, 0.0f, 10.0f);
                 if (ImGui::MenuItem("New", "CTRL + N"))
                 {
-                    // Handle menu item click
-                    // pop up save current layout?
-                    // destroy this instance of UIlayer and viewports
-                    // new UIlayer instance
+                    m_viewports.clear();
 
                 }
-                if (ImGui::MenuItem("Save", "CTRL + S"))
-                {
-                    // take path from memory and save here
-                }
+                
 
                 if (ImGui::MenuItem("Open", "CTRL + O"))
                 {
-                    std::string path = loadFileDialog("Referencer file (*.ref)\0*.ref\0*.png\0*.png\0*.jpg\0*.jpg\0*.obj\0*.obj\0");
+                    std::string path = loadFileDialog("Referencer file (*.ref2d)\0*.ref2d\0*.png\0*.png\0*.jpg\0*.jpg\0*.obj\0*.obj\0");
                     if (path != "")
                     {
                         std::string name = "viewport(2D)_";
@@ -368,10 +354,21 @@ namespace Referencer {
                 }
                 if (ImGui::MenuItem("Save as", "CTRL + SHIFT + S"))
                 {
-                    std::string path = saveFileDialog("Referencer file (*.ref)\0.ref\0");
+                    std::string path = saveFileDialog("Referencer file (*.ref2d)\0.ref2d\0");
                     if (path != "")
                     {
-                        // save file
+                        std::ofstream file(path + ".ref2d", std::ios::binary);
+                        for (int i = 0; i < m_viewports.size(); ++i)
+                        {
+                            Viewport2D* viewport2DPtr = dynamic_cast<Viewport2D*>(m_viewports[i]);
+                            if (viewport2DPtr != nullptr) {
+                                // Successfully cast to Viewport2D, handle accordingly
+                                viewport2DPtr->SerializeImage(file);
+                                continue;
+                            }
+
+
+                        }
                     }
                 }
                 ImGui::MenuItem("Show settings", NULL, &m_showSettings);
@@ -380,16 +377,11 @@ namespace Referencer {
             }
             if (ImGui::BeginMenu("Edit"))
             {
-                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-                if (ImGui::MenuItem("Redo", "CTRL+Y")) {}  // Disabled item
-                ImGui::Separator();
                 if (ImGui::MenuItem("Delete", "DEL")) {}
                 if (ImGui::MenuItem("Hide", "H")) {}
                 if (ImGui::MenuItem("Duplicate", "CTRL+D")) {}
                 ImGui::EndMenu();
             }
-            ImGuiIO& io = ImGui::GetIO();
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::EndMainMenuBar();
         }
 
@@ -488,17 +480,22 @@ namespace Referencer {
         ImGuiStyle& style = ImGui::GetStyle();
 
         // ImGui colors
-        ImGui::Text("ImGui Colors");
+        ImGui::Text("Colors");
         ImGui::ColorEdit4("Window Bg", (float*)&style.Colors[ImGuiCol_WindowBg], ImGuiColorEditFlags_Float);
+        ImGui::Separator();
         ImGui::ColorEdit4("Header", (float*)&style.Colors[ImGuiCol_Header], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Header Hovered", (float*)&style.Colors[ImGuiCol_HeaderHovered], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Header Active", (float*)&style.Colors[ImGuiCol_HeaderActive], ImGuiColorEditFlags_Float);
+        ImGui::Separator();
         ImGui::ColorEdit4("Button", (float*)&style.Colors[ImGuiCol_Button], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Button Hovered", (float*)&style.Colors[ImGuiCol_ButtonHovered], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Button Active", (float*)&style.Colors[ImGuiCol_ButtonActive], ImGuiColorEditFlags_Float);
+        ImGui::Separator();
         ImGui::ColorEdit4("Frame Bg", (float*)&style.Colors[ImGuiCol_FrameBg], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Frame Bg Hovered", (float*)&style.Colors[ImGuiCol_FrameBgHovered], ImGuiColorEditFlags_Float);
-        ImGui::ColorEdit4("Frame Bg Active", (float*)&style.Colors[ImGuiCol_FrameBgActive], ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit4("Frame Bg Active", (float*)&style.Colors[ImGuiCol_FrameBgActive], 
+            ImGuiColorEditFlags_Float);
+        ImGui::Separator();
         ImGui::ColorEdit4("Title Bg", (float*)&style.Colors[ImGuiCol_TitleBg], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Title Bg Active", (float*)&style.Colors[ImGuiCol_TitleBgActive], ImGuiColorEditFlags_Float);
         ImGui::ColorEdit4("Title Bg Collapsed", (float*)&style.Colors[ImGuiCol_TitleBgCollapsed], ImGuiColorEditFlags_Float);
@@ -537,7 +534,7 @@ namespace Referencer {
             std::transform(ending.begin(), ending.end(), ending.begin(),
                 [](unsigned char ch) { return std::tolower(static_cast<char>(std::tolower(static_cast<unsigned char>(ch)))); });
 
-            if (ending == "ref")
+            if (ending == "ref2d")
             {
                 std::ifstream file(path, std::ios::binary);
                 if (!file) { // ma to problem s utf 8

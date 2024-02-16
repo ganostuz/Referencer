@@ -48,9 +48,11 @@ namespace Referencer {
 		glfwSetWindowUserPointer(m_window, this); // you want this
 		glfwSetWindowSizeLimits(m_window, 300, 100, GLFW_DONT_CARE, GLFW_DONT_CARE);
 		setVSync(true);
+
 		GLFWimage images[1];
-		images[0].pixels = stbi_load("resources/images/logo.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
-		glfwSetWindowIcon(m_window, 1, images);
+		images[0].pixels = stbi_load("D:/dev/Referencer/Referencer/resources/images/logo.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		if (images[0].pixels != nullptr)
+			glfwSetWindowIcon(m_window, 1, images);
 		stbi_image_free(images[0].pixels);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

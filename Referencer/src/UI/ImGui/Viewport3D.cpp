@@ -12,7 +12,7 @@
 namespace Referencer {
 
 	Viewport3D::Viewport3D(std::string name, bool isOpen, std::string path)
-		:Viewport(name, isOpen), m_firstMouse(true), m_width(400),m_modelSource(path), m_vertex("resources/modelShader.vertex"),m_fragment("resources/modelShader.fragment"), m_height(400), m_shader("resources/modelShader.vertex", "resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false)
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400),m_modelSource(path), m_vertex("D:/dev/Referencer/Referencer/resources/modelShader.vertex"),m_fragment("D:/dev/Referencer/Referencer/resources/modelShader.fragment"), m_height(400), m_shader("D:/dev/Referencer/Referencer/resources/modelShader.vertex", "D:/dev/Referencer/Referencer/resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false)
 	{
 		genBuffers();
 		m_hasTexture = m_model.textures_loaded.size() > 0;
@@ -121,14 +121,18 @@ namespace Referencer {
 			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
 				setOpened(false);
 
+			ImGui::SeparatorText("color");
 			ImGui::ColorEdit3("Light color", &m_lightColor.x);
 			ImGui::ColorEdit3("Object color", &m_objectColor.x);
+			ImGui::SeparatorText("light position");
 			ImGui::SliderFloat("LightPosX", &m_lightPos.x, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("LightPosY", &m_lightPos.y, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("LightPosZ", &m_lightPos.z, -10.f, 10.f, "%.2f");
+			ImGui::SeparatorText("object position");
 			ImGui::SliderFloat("ObjectPosX", &m_translate.x, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("ObjectPosY", &m_translate.y, -10.f, 10.f, "%.2f");
 			ImGui::SliderFloat("ObjectPosZ", &m_translate.z, -10.f, 10.f, "%.2f");
+			ImGui::SeparatorText("scaling");
 			ImGui::SliderFloat("Scale Object", &m_scale, 0.f, 10.f, "%.3f");
 			ImGui::BeginDisabled(!m_hasTexture);
 			ImGui::SliderFloat("Material vs Texture", &m_interpolation, 0, 1.f, "%.3f");

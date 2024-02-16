@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Referencer::Application" Collapsed="true">
+    <Position X="1.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CIAAAgAAABAIQgEgAgQAIgIAAAACAEAAQAAAAAAAAAA=</HashCode>
+      <FileName>src\Application.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::ID" Collapsed="true">
+    <Position X="5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAQAQQAAAAAAAAAAAAAgAAAAAgA=</HashCode>
+      <FileName>src\ID.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Layer" Collapsed="true">
+    <Position X="3.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EQAAAAQAAAAAQAAAAAAAoAAAAAAAAAFEAAAEAAAAAAA=</HashCode>
+      <FileName>src\Layer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::LayerStack" Collapsed="true">
+    <Position X="0.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAKCAAAgAAACAEIQAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>src\LayerStack.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Settings" Collapsed="true">
+    <Position X="0.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAIAgAAAAAAICAAAAIAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>src\Settings.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Window" Collapsed="true">
+    <Position X="3.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QQAAAAAAAAAAACAAAAAAQAAAAQAAQAAAAQBAAIAAAAA=</HashCode>
+      <FileName>src\Window.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::UIlayer" Collapsed="true">
+    <Position X="3.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQIAAAAgAAACUAAAABUQoAAACAAAMcFAAdEBAQBCcAA=</HashCode>
+      <FileName>src\UI\ImGui\UIlayer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Viewport" Collapsed="true">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EQAAAAAQAACEQADAAQQAAAAQAQgAgAQAABAEEAAAAAg=</HashCode>
+      <FileName>src\UI\ImGui\Viewport.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Viewport2D" Collapsed="true">
+    <Position X="6.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gYAAAQACAAAAQAQBAAAAIBAQgQAAAACEAAABEAAAAAA=</HashCode>
+      <FileName>src\UI\ImGui\Viewport2D.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Viewport3D" Collapsed="true">
+    <Position X="8.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BwAAAQAAAAAAQqQJgAEEEAAAQQigAACGQmEAkABAAAI=</HashCode>
+      <FileName>src\UI\ImGui\Viewport3D.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Mesh" Collapsed="true">
+    <Position X="9.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgQgAAAEAAAgAAAAAAAAAAAAAQAAAAAQAAAAAEACA=</HashCode>
+      <FileName>src\Renderer\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Model" Collapsed="true">
+    <Position X="9.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAACAARAigAAACAAAAAIAAAAAASAAgAAAAAAAA=</HashCode>
+      <FileName>src\Renderer\Model.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Camera" Collapsed="true">
+    <Position X="9.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAECAACAAAAEAAAAACIEDAASAAABEARAAAAAgA=</HashCode>
+      <FileName>src\Renderer\MyCamera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Shader" Collapsed="true">
+    <Position X="9.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAACBAIAACALAABAAAAAAAAgAAAAIBAAAQAAABAA=</HashCode>
+      <FileName>src\Renderer\Shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::WindowsWindow" Collapsed="true">
+    <Position X="3.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>yQAAAAAAAAAAACABQAQBQAAAAAAAUAKAAQAAAIAAAAA=</HashCode>
+      <FileName>src\OS\WindowsWindow.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::Event" Collapsed="true">
+    <Position X="0.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAECkAAAEAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\Event.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::EventDispatcher" Collapsed="true">
+    <Position X="4" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>src\events\Event.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::KeyEvent" Collapsed="true">
+    <Position X="2.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAACAAiAAAAAAAAAACAAAA=</HashCode>
+      <FileName>src\events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::KeyPressedEvent" Collapsed="true">
+    <Position X="4.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAIAAEAAAAAQAABAAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>src\events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::KeyReleasedEvent" Collapsed="true">
+    <Position X="8.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAEAAAAAQAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::KeyTypedEvent" Collapsed="true">
+    <Position X="6.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAEAAAAAQAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>src\events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::MouseMovedEvent" Collapsed="true">
+    <Position X="5.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAEAAACAQAQCAAAAAAAAAAAAGAAAAA=</HashCode>
+      <FileName>src\events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::MouseScrolledEvent" Collapsed="true">
+    <Position X="7.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAYAAAAAAEAAAAAQAAiAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::MouseButtonPressed" Collapsed="true">
+    <Position X="3.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAEQAAAAAAEAAAAAQAACAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::MouseButtonReleased" Collapsed="true">
+    <Position X="10" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAEQAAAAAAEAAAAAQAACAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>src\events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::WindowResizedEvent" Collapsed="true">
+    <Position X="5.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAQAAAAAAFAAAAgQAACAAAQACAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\ApplicationEvents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::WindowCloseEvent" Collapsed="true">
+    <Position X="7.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAIEAAAAAQAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\ApplicationEvents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::WindowMovedEvent" Collapsed="true">
+    <Position X="3.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAEAAAAAQAACCAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\events\ApplicationEvents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Referencer::DragAndDropEvent" Collapsed="true">
+    <Position X="10" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAUAAAAAQEAAAAAQEACAAAAAAAAAAAAAQEAAA=</HashCode>
+      <FileName>src\events\ApplicationEvents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Referencer::SettingsHolder" Collapsed="true">
+    <Position X="0.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAADAAAAAABAQAAAAAAAAAAAAkAAAACAAAAShACAA=</HashCode>
+      <FileName>src\Settings.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Referencer::ImageData" Collapsed="true">
+    <Position X="7.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAUAQAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\UI\ImGui\Viewport2D.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Referencer::Vertex" Collapsed="true">
+    <Position X="7.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAIAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Renderer\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Referencer::Texture" Collapsed="true">
+    <Position X="7.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAABAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>src\Renderer\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Referencer::EventType" Collapsed="true">
+    <Position X="2.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAACAAAAAAAAAAAAAAAAgAAAAEAAgAAAEAIAREgAQA=</HashCode>
+      <FileName>src\events\Event.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Referencer::EventCategory" Collapsed="true">
+    <Position X="0.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAQAAAAAAAAAAAAAAAAAAAQAAQAAEAAIA=</HashCode>
+      <FileName>src\events\Event.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -146,6 +146,7 @@ namespace Referencer {
 
 		if (ImGui::Begin(("###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
 		{
+			ImGui::PopStyleVar(2);
 			m_width = ImGui::GetWindowSize().x;
 			m_height = ImGui::GetWindowSize().y;
 
@@ -174,7 +175,7 @@ namespace Referencer {
 
 		ImGui::End();
 
-		ImGui::PopStyleVar(2);
+		
 
 		
 
