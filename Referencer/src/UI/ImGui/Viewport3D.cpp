@@ -8,19 +8,27 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+#include "thirdParty\imgui_notify.h"
+
 
 namespace Referencer {
 
 	Viewport3D::Viewport3D(std::string name, bool isOpen, std::string path)
-		:Viewport(name, isOpen), m_firstMouse(true), m_width(400),m_modelSource(path), m_vertex("D:/dev/Referencer/Referencer/resources/modelShader.vertex"),m_fragment("D:/dev/Referencer/Referencer/resources/modelShader.fragment"), m_height(400), m_shader("D:/dev/Referencer/Referencer/resources/modelShader.vertex", "D:/dev/Referencer/Referencer/resources/modelShader.fragment"), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false)
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_modelSource(path), m_height(400), m_shader("D:/dev/Referencer/Referencer/resources/modelShader.vertex", "D:/dev/Referencer/Referencer/resources/modelShader.fragment", true), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false), m_showShaderEditor(false)
 	{
+		// pridaj set shaders odstran zavislost od dependencies
+		m_fragment = m_shader.getFragmentShader();
+		m_vertex = m_shader.getVertexShader();
 		genBuffers();
 		m_hasTexture = m_model.textures_loaded.size() > 0;
 		m_center = m_model.GetCenter();
 	}
 	Viewport3D::Viewport3D(const Viewport3D& other)
-		: Viewport(other), m_firstMouse(true), m_width(other.m_width), m_modelSource(other.m_modelSource), m_vertex(other.m_vertex), m_fragment(other.m_fragment), m_height(other.m_height), m_shader(other.m_vertex, other.m_fragment), m_camera(other.m_camera), m_model(other.m_modelSource), m_first_time(other.m_first_time), m_scale(other.m_scale), m_lightStrength(other.m_lightStrength), m_interpolation(other.m_interpolation), m_showSettings(false)
+		: Viewport(other), m_firstMouse(true), m_width(other.m_width), m_modelSource(other.m_modelSource), m_height(other.m_height), m_shader(), m_camera(other.m_camera), m_model(other.m_modelSource), m_first_time(other.m_first_time), m_scale(other.m_scale), m_lightStrength(other.m_lightStrength), m_interpolation(other.m_interpolation), m_showSettings(false), m_showShaderEditor(false)
 	{
+		m_shader.setShaders(other.m_shader.getVertexShader(), other.m_shader.getFragmentShader());
+		m_fragment = m_shader.getFragmentShader();
+		m_vertex = m_shader.getVertexShader();
 		m_objectColor = other.m_objectColor;
 		m_translate = other.m_translate;
 		m_lightPos = other.m_lightPos;
@@ -42,9 +50,17 @@ namespace Referencer {
 	{
 		setSelected(true);
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
+		{
+			ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Viewport deleted" });
 			setRunning(false);
+		}
 		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
+		{
+			ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Viewport hidden" });
 			setOpened(false);
+		}
+		if (ImGui::IsKeyDown(ImGuiKey_MouseRight))
+			ImGui::OpenPopup("my_select_popup");
 
 		// mouse positions & click
 		if (ImGui::IsMouseDown(2))
@@ -96,7 +112,7 @@ namespace Referencer {
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{
-			std::cerr << "FRAMEBUFFER NOT DONE" << std::endl;
+			std::cerr << "FRAMEBUFFER NOT DONE" << std::endl; // error handling
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -114,7 +130,7 @@ namespace Referencer {
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowPos(ImVec2(ImGui::GetMousePos().x+10, ImGui::GetMousePos().y + 10), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin(("###settings" + getFullName()).c_str(), &m_showSettings, windowFlags))
+		if (ImGui::Begin((this->getName() + " settings###settings" + std::to_string(getID().get())).c_str(), &m_showSettings, windowFlags))
 		{
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 				setRunning(false);
@@ -149,14 +165,12 @@ namespace Referencer {
 	void Viewport3D::renderImGuiModel()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImVec2 window_pos;
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollWithMouse| ImGuiWindowFlags_NoScrollbar;// todo: handle it normalne by si scrollbar ani scrolling zakazovat nemusel
 		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
 
-		if (ImGui::Begin(("###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
+		if (ImGui::Begin((this->getName() + "###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
 		{
-			window_pos = ImGui::GetWindowPos();
 			if (ImGui::IsWindowHovered())
 				handleInput();
 			else
@@ -174,23 +188,23 @@ namespace Referencer {
 
 			ImGui::Image((void*)(intptr_t)m_texture, ImVec2{ (float)m_width, (float)m_height }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
-			ImGuiIO io = ImGui::GetIO();
-			if (ImGui::IsKeyDown(ImGuiKey_MouseRight) && ImGui::IsWindowHovered())
-				ImGui::OpenPopup("my_select_popup");
+			
 
-			ImGui::PopStyleVar();
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(7.5f, 7.5f));
 			if (ImGui::BeginPopup("my_select_popup"))
 			{
 				ImGui::MenuItem("Opened", "Del", &isRunning());
 				ImGui::MenuItem("Visible", "H", &isOpened());
 				ImGui::MenuItem("Show settings", "idk", &m_showSettings);
+				ImGui::MenuItem("Show shader editor", "idk", &m_showShaderEditor);
 				ImGui::EndPopup();
 			}
-
+			ImGui::PopStyleVar();
 			
 			
 		}
 		ImGui::End();
+		ImGui::PopStyleVar();
 		
 	}
 
@@ -254,6 +268,9 @@ namespace Referencer {
 
 		if (m_showSettings)
 			renderImGuiModelSpecs();
+
+		if (m_showShaderEditor)
+			renderShaderEditor();
 		renderImGuiModel();
 	}
 
@@ -278,6 +295,43 @@ namespace Referencer {
 		m_lightPos[0] = lightPos.x;
 		m_lightPos[1] = lightPos.y;
 		m_lightPos[2] = lightPos.z;
+	}
+
+	void Viewport3D::renderShaderEditor()
+	{
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
+		ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(ImGui::GetMousePos().x + 10, ImGui::GetMousePos().y + 10), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin((this->getName() + " shader editor###shaderEditor" + std::to_string(getID().get())).c_str(), &m_showShaderEditor, windowFlags))
+		{
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete)))
+				setRunning(false);
+			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
+				setOpened(false);
+
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F5)))
+			{
+				ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Shader compiled" });
+				m_shader.setShaders("", m_fragment);
+			}
+
+			// this will be shader editor
+			ImGui::InputTextMultiline("##", m_fragment.data(), m_fragment.capacity() + 1, ImGui::GetContentRegionAvail(), ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_AutoSelectAll, TextEditCallback, &m_fragment);
+
+		}
+		ImGui::End();
+	}
+
+	int Viewport3D::TextEditCallback(ImGuiInputTextCallbackData* data)
+	{
+		if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
+			// Resize string callback
+			std::string* str = (std::string*)data->UserData;
+			IM_ASSERT(data->Buf == str->c_str());
+			str->resize(data->BufTextLen);
+			data->Buf = (char*)str->c_str();
+		}
+		return 0;
 	}
 
 

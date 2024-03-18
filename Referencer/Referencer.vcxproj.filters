@@ -54,6 +54,7 @@
     <ClInclude Include="src\UI\ImGui\Viewport3D.h">
       <Filter>UI\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utilities.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\events\ApplicationEvents.h">
       <Filter>events</Filter>

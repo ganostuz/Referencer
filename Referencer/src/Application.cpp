@@ -8,6 +8,7 @@
 #include "assimp\BaseImporter.h"
 #include "TestLayer.h"
 #include "stb_image.h"
+#include "curl/curl.h"
 
 
 namespace Referencer {
@@ -59,6 +60,7 @@ namespace Referencer {
 	}
 	void Application::run()
 	{
+		
 
 		while (m_running)
 		{

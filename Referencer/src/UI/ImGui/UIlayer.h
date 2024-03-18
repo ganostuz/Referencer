@@ -19,9 +19,9 @@ namespace Referencer {
 		std::vector<Viewport*> m_viewports;
 		float m_zoom, m_instantZoom;
 		int m_offsetX, m_offsetY, m_instantOffsetX, m_instantOffsetY, m_viewportIndex;
-		bool m_showMenu, m_wasCopyed, m_showSettings;
+		bool m_showMenu, m_wasCopyed, m_showSettings, m_showInternetDialog, m_save;
 
-		char m_renameBuffer[30];
+		std::string m_renameBuffer, m_urlBuffer, m_outputPathBuffer;
 		Viewport* m_renameViewportPointer;
 
 	public:
@@ -41,9 +41,6 @@ namespace Referencer {
 		void Render();
 		void UpdateViewports();
 
-		std::string saveFileDialog(const char* filter);
-		std::string loadFileDialog(const char* filter);
-
 		void LoadSettingsToImGui(const SettingsHolder& settings);
 		void SaveImGuiToSettings(SettingsHolder& settings);
 
@@ -52,8 +49,11 @@ namespace Referencer {
 		void RenderLayerManager();
 		void RenderViewports();
 		void ShowGlobalSettingsEditor();
+		void RenderInternetDialog();
+		void RenderNotifications();
 
 		bool handleDrops(DragAndDropEvent& e);
+		static int TextEditCallback(ImGuiInputTextCallbackData* data);
 
 		
 

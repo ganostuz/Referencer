@@ -5,6 +5,7 @@
 #include "events\Event.h"
 #include "Renderer\Shader.h"
 #include "Renderer\Model.h"
+#include "imgui.h"
 
 // this class can be used only in imgui context
 
@@ -19,7 +20,7 @@ namespace Referencer {
 		Shader m_shader;
 
 		unsigned int m_fbo, m_texture, m_rbo, m_width, m_height;
-		bool m_firstMouse, m_first_time, m_hasTexture, m_showSettings; // one time usage
+		bool m_firstMouse, m_first_time, m_hasTexture, m_showSettings, m_updateShaderAutomatically, m_showShaderEditor; // one time usage
 		glm::vec2 m_lastMouse;
 		std::string m_vertex, m_fragment, m_modelSource;
 		//light, color, material settings
@@ -33,7 +34,9 @@ namespace Referencer {
 		void renderModel();
 		void renderImGuiModelSpecs();
 		void renderImGuiModel();
+		void renderShaderEditor();
 		void computeLightPos(float distance, glm::vec2 deltaAngleRadians);
+		static int TextEditCallback(ImGuiInputTextCallbackData* data);
 
 	public:
 		Viewport3D(std::string name, bool isOpen, std::string path);

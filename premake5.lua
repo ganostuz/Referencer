@@ -51,14 +51,15 @@ project "Referencer"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
-		"Referencer/vendor/assimp_build/include",
+		"Referencer/vendor/assimp/include", --%{prj.name}
 		"%{IncludeDir.GLM}",
-		"Referencer/vendor/toml/toml11-master",
-		"Referencer/vendor/STB",
-		--"%{IncludeDir.libCURL}",
+		"Referencer/vendor/toml/toml11-master", -- %{prj.name}
+		"Referencer/vendor/STB", -- %{prj.name}
+		"D:/dev/Referencer/Referencer/vendor/curl/debug/include", -- %{prj.name}
 	}
-	libdirs { "Referencer/vendor/assimp_build/lib/Debug"}
-	--
+	--"Referencer/vendor/assimp/lib/Release"
+	libdirs { "Referencer/vendor/assimp/lib/Debug", "D:/dev/Referencer/Referencer/vendor/curl/debug/lib"}
+	
 	links 
 	{ 
 		"GLFW",
@@ -66,9 +67,18 @@ project "Referencer"
 		"ImGui",
 		"opengl32.lib",
 		"GLM",
+		-- add to respective configurations
 		"assimp-vc143-mtd.lib",
 		"zlibstaticd.lib",
-		--"libCURL"
+		--"assimp-vc143-mt.lib",
+		--"zlibstatic.lib",
+		"libcurl_a_debug.lib",
+
+		-- needed for curl windows -> add to windows 
+		"Ws2_32.lib",
+		"Wldap32.lib",
+		"Normaliz.lib",
+		"Crypt32.lib",
 	}
 
 	filter "system:windows"

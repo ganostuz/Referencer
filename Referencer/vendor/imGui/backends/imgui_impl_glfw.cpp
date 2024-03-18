@@ -1053,8 +1053,9 @@ static void ImGui_ImplGlfw_CreateWindow(ImGuiViewport* viewport)
     //_____________________STANO_____________________________
     GLFWimage images[1];
     stbi_set_flip_vertically_on_load(false);
-    images[0].pixels = stbi_load("resources/images/logo_child.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
-    glfwSetWindowIcon(vd->Window, 1, images);
+    images[0].pixels = stbi_load("D:/dev/Referencer/Referencer/resources/images/logo_child.png", &images[0].width, &images[0].height, 0, 4); //rgba channels
+    if (images[0].pixels != nullptr)
+        glfwSetWindowIcon(vd->Window, 1, images);
     stbi_image_free(images[0].pixels);
 
 #ifdef _WIN32

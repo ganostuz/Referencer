@@ -7,6 +7,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "Utilities.h"
 
 namespace Referencer {
 
@@ -27,35 +28,10 @@ namespace Referencer {
 		else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)))
 			setOpened(false);
 
-		if (ImGui::IsKeyDown(ImGuiKey_MouseRight) && ImGui::IsWindowHovered())
-			ImGui::OpenPopup("my_select");
+		if (ImGui::IsKeyDown(ImGuiKey_MouseRight))
+			ImGui::OpenPopup("my_select_popup");
 
-		//ImGui::PopStyleVar();
-		if (ImGui::BeginPopup("my_select"))
-		{
-			ImGui::MenuItem("Opened", "Del", &isRunning());
-			ImGui::MenuItem("Visible", "H", &isOpened());
-			if (ImGui::MenuItem("BG color")) {
-				ImGui::OpenPopup("ColorPopup");
-			}
-			ImGui::EndPopup();
-		}
-
-		if (ImGui::BeginPopup("ColorPopup"))
-		{
-			static ImVec4 bgColor = ImVec4(0.3f, 0.5f, 0.7f, 1.0f); // Initial background color temp
-
-			// Color picker widget
-			ImGui::ColorPicker4("Background Color", (float*)&bgColor, ImGuiColorEditFlags_Float);
-
-			// Apply button
-			if (ImGui::Button("Apply")) {
-				ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = bgColor; // Change window background color
-				ImGui::CloseCurrentPopup(); // Close the pop-up after applying
-			}
-
-			ImGui::EndPopup();
-		}
+		
 
 		//handle scroll & mouse
 	}
@@ -69,7 +45,7 @@ namespace Referencer {
 	}
 	// constructor takes name bool isOpen and sourcem image path
 	Viewport2D::Viewport2D(std::string name, bool isOpen, std::string source, int posX, int posY, std::shared_ptr<ImageData> image)
-		:Viewport(name, isOpen), m_texture(0), m_posX(posX), m_posY(posY), m_imageSource(source), m_zoom(0.0f), m_image(image)
+		:Viewport(name, isOpen), m_texture(0), m_posX(posX), m_posY(posY), m_imageSource(source), m_zoom(0.0f), m_image(image), m_flipHorizontal(false), m_flipVertical(false), m_bgColor(0.2f,0.2f,0.2f,0.2f)
 	{
 		// TODO: popripade mozes nechat nacitany obrazok do pamate
 		if (m_image == nullptr)
@@ -95,7 +71,7 @@ namespace Referencer {
 		// above to render
 	}
 	Viewport2D::Viewport2D(const Viewport2D& other)
-		: Viewport(other), m_texture(0), m_posX(other.m_posX + 10), m_posY(other.m_posY + 10), m_imageSource(other.m_imageSource), m_width(other.m_width), m_height(other.m_height), m_zoom(other.m_zoom)
+		: Viewport(other), m_texture(0), m_posX(other.m_posX + 10), m_posY(other.m_posY + 10), m_imageSource(other.m_imageSource), m_width(other.m_width), m_height(other.m_height), m_zoom(other.m_zoom), m_flipHorizontal(other.m_flipHorizontal), m_flipVertical(other.m_flipVertical), m_bgColor(other.m_bgColor)
 	{
 		// Create a new ImageData object with a copy of the pixel data
 		m_image = std::make_shared<ImageData>(*other.m_image);
@@ -119,34 +95,28 @@ namespace Referencer {
 	// function called every frame
 	void Viewport2D::onUpdate(int offsetX, int offsetY, float instantZoom, float totalZoom)
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		
-
-		// toto asi netreba
-		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
 
 		if (offsetX != 0 || offsetY != 0)
 		{
 			pan(offsetX, offsetY);
 		}
-		ImGui::SetNextWindowSize({ m_width / 2, m_height / 2 }, ImGuiCond_FirstUseEver);
+
+		//ImGui::SetNextWindowSize({ m_width / 2, m_height / 2 }, ImGuiCond_FirstUseEver);
 
 		if (m_zoom != 0.0f)
 		{
 			// prv resiznut podla minuleho framu nasledne prijat dalsi input
-			ImGui::SetNextWindowPos({ m_posX - m_zoom / 2, m_posY - m_zoom / 2 });
 			ImGui::SetNextWindowSize({ m_width + m_zoom, m_height + m_zoom });
 
 			m_zoom = 0.0f;
 		}
 
-		
-
-		if (ImGui::Begin(("###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, m_bgColor);
+		if (ImGui::Begin((this->getName() + "###" + std::to_string(getID().get())).c_str(), &isRunning(), windowFlags))
 		{
-			ImGui::PopStyleVar(2);
+			
 			m_width = ImGui::GetWindowSize().x;
 			m_height = ImGui::GetWindowSize().y;
 
@@ -158,22 +128,54 @@ namespace Referencer {
 			else
 				setSelected(false);
 			// will go to render
+			
+			ImVec2 uv1(m_flipHorizontal == true ? 1.0f : 0.0f, m_flipVertical == true ? 1.0f : 0.0f);
+			ImVec2 uv2(m_flipHorizontal == true ? 0.0f : 1.0f, m_flipVertical == true ? 0.0f : 1.0f);
 
-			ImGuiIO io = ImGui::GetIO();
-			if (ImGui::IsKeyDown(ImGuiKey_MouseRight) && ImGui::IsWindowHovered())
-				ImGui::OpenPopup("my_select_popup");
+			ImVec2 windowSize = ImGui::GetWindowSize();
+			ImVec2 imageSize(256, 256); // Example size, adjust based on your image
+			ImVec2 imagePos = ImVec2(
+				(windowSize.x - imageSize.x) / 2,
+				(windowSize.y - imageSize.y) / 2
+			);
+			ImGuiIO& io = ImGui::GetIO();
+			// Render the image
+			ImGui::SetCursorPos(imagePos);
 
+			ImGui::Image((void*)(intptr_t)m_texture, imageSize, uv1, uv2);
+			
+
+			ImRect rc = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+			ImVec2 mouseUVCoord = (io.MousePos - rc.Min) / rc.GetSize();
+
+			if (io.KeyCtrl &&  mouseUVCoord.x >= 0.f && mouseUVCoord.y >= 0.f && mouseUVCoord.x <= 1.f && mouseUVCoord.y <= 1.f)
+			{
+
+				Utilities::inspect(m_image->width, m_image->height, m_image->pixels, mouseUVCoord, ImVec2(256,256));
+			}
 			if (ImGui::BeginPopup("my_select_popup"))
 			{
 				ImGui::MenuItem("Opened", "Del", &isRunning());
 				ImGui::MenuItem("Visible", "H", &isOpened());
+				
+				if (ImGui::BeginMenu("transform"))
+				{
+					ImGui::MenuItem("Flip horizontal", "", &m_flipHorizontal);
+					ImGui::MenuItem("Flip vertical", "", &m_flipVertical);
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("edit colors"))
+				{
+					ImGui::ColorPicker3("Background Color", (float*)&m_bgColor, ImGuiColorEditFlags_Float);
+
+					ImGui::EndMenu();
+				}
 				ImGui::EndPopup();
 			}
 
-			ImGui::Image((void*)(intptr_t)m_texture, ImVec2(m_width, m_height));
 		}
-
 		ImGui::End();
+		ImGui::PopStyleColor();
 
 		
 

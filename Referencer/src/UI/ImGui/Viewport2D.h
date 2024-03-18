@@ -1,5 +1,6 @@
 #pragma once
 #include "Viewport.h"
+#include <imgui.h>
 
 // this class can be used only in imgui context
 
@@ -19,6 +20,8 @@ namespace Referencer {
 		float m_zoom; // width to heigh
 		unsigned int m_texture;
 		std::string m_imageSource;
+		bool m_flipVertical, m_flipHorizontal;
+		ImVec4 m_bgColor;
 
 		void handleInput();
 		void pan(float x, float y);

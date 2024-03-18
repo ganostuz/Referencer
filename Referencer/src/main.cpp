@@ -2,6 +2,7 @@
 #include "Application.h"
 #include <Windows.h>
 
+
 #ifdef _WIN32
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
 {

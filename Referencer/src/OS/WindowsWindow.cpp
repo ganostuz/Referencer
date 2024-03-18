@@ -42,8 +42,10 @@ namespace Referencer {
 		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+
 		//HWND hWnd = glfwGetWin32Window(m_window);
 		//DragAcceptFiles(hWnd, TRUE);
+
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this); // you want this
 		glfwSetWindowSizeLimits(m_window, 300, 100, GLFW_DONT_CARE, GLFW_DONT_CARE);

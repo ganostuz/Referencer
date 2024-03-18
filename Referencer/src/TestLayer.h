@@ -82,7 +82,7 @@ namespace Referencer {
 		}
 	public:
 		TestLayer(const std::string& name = "Layer")
-			: Layer(name), ourShader("resources/modelShader.vertex", "resources/modelShader.fragment"), ourCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f, 1.f, 0.f)), ourModel("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj"){}
+			: Layer(name), ourShader("resources/modelShader.vertex", "resources/modelShader.fragment", true), ourCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f, 1.f, 0.f)), ourModel("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj"){}
 		~TestLayer(){}
 
 		void onAttach()
