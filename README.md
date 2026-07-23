@@ -1,2 +1,2 @@
 # Referencer
-Reference desktop app for artists, referencer is currently under a proprietary based software license which is currently not open-source.
+Reference desktop app for artists. It uses OpenGL, glfw, glad and ImGui among the others. It was used solely by me because I wanted 3D references and not just 2D as in pureref. It is app similar to pureref but has 2D and 3D viewports. Right now it solely works on windows, hope to change that soon. Feel free to take inspiration from this but do not take it as reference :D. Back then I was not very good at keeping good coding practises.
