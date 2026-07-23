@@ -2,19 +2,20 @@
 
 #include "Viewport3D.h"
 #include "Viewport.h"
+#include "ResourcePath.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include "thirdParty\imgui_notify.h"
+#include "thirdParty/imgui_notify.h"
 
 
 namespace Referencer {
 
 	Viewport3D::Viewport3D(std::string name, bool isOpen, std::string path)
-		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_modelSource(path), m_height(400), m_shader("D:/dev/Referencer/Referencer/resources/modelShader.vertex", "D:/dev/Referencer/Referencer/resources/modelShader.fragment", true), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false), m_showShaderEditor(false)
+		:Viewport(name, isOpen), m_firstMouse(true), m_width(400), m_modelSource(path), m_height(400), m_shader(resourcePath("modelShader.vertex").string(), resourcePath("modelShader.fragment").string(), true), m_camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)), m_model(path), m_first_time(true), m_scale(1.0f), m_lightColor(1.0f, 1.0f, 1.0f), m_lightStrength(1), m_lightPos(2.0f,2.0f,2.0f), m_objectColor(0.5f, 0.5f, 0.5f), m_translate(0.0f, 0.0f, 0.0f), m_interpolation(0.0f), m_showSettings(false), m_showShaderEditor(false)
 	{
 		// pridaj set shaders odstran zavislost od dependencies
 		m_fragment = m_shader.getFragmentShader();

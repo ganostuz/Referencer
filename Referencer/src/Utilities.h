@@ -1,18 +1,27 @@
 #pragma once
-#define CURL_STATICLIB
+#if defined(_WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32 
+#endif
 
+#include <cstdio>
+#include <filesystem>
 #include <string>
 #include "Debug.h"
 #include "Application.h"
 
-#include <Windows.h>
-#include <ShObjIdl.h>
-#include <atlbase.h>
+#if defined(_WIN32)
+#include <windows.h>
+#include <commdlg.h>
+#include <shobjidl.h>
+#else
+#include <unistd.h>
+#endif
 
 #include <GLFW/glfw3.h>
-#include "GLFW\glfw3native.h"
-#include "curl\curl.h"
+#if defined(_WIN32)
+#include "GLFW/glfw3native.h"
+#endif
+#include "curl/curl.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -112,7 +121,7 @@ namespace Referencer {
         // open native dialog window for saving content
         static std::string saveFileDialog(const char* filter)
         {
-
+#if defined(_WIN32)
             OPENFILENAMEA ofn;
             char szFile[260] = { 0 };
 
@@ -123,17 +132,25 @@ namespace Referencer {
             ofn.nMaxFile = sizeof(szFile);
             ofn.lpstrFilter = filter;
             ofn.nFilterIndex = 1;
-            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_OVERWRITEPROMPT;
 
             if (GetSaveFileNameA(&ofn) == TRUE)
             {
                 return ofn.lpstrFile;
             }
             return std::string();
+#else
+            (void)filter;
+            return runLinuxDialog(
+                "zenity --file-selection --save --confirm-overwrite "
+                "--title='Save Referencer file' --file-filter='Referencer files | *.ref2d'",
+                "kdialog --getsavefilename . '*.ref2d|Referencer files'");
+#endif
         }
         // open native dialog window for loading content
         static std::string loadFileDialog(const char* filter)
         {
+#if defined(_WIN32)
             OPENFILENAMEA ofn;
             char szFile[260] = { 0 };
 
@@ -151,50 +168,70 @@ namespace Referencer {
                 return ofn.lpstrFile;
             }
             return std::string();
+#else
+            (void)filter;
+            return runLinuxDialog(
+                "zenity --file-selection --title='Open file' "
+                "--file-filter='Supported files | *.ref2d *.png *.webp *.jpeg *.jpg *.bmp *.psd *.obj *.stl *.gltf *.glb *.fbx'",
+                "kdialog --getopenfilename . '*.ref2d *.png *.webp *.jpeg *.jpg *.bmp *.psd *.obj *.stl *.gltf *.glb *.fbx|Supported files'");
+#endif
         }
         // open native dialog window for choosing directory
         static std::string openFolderDialog()
         {
-            std::wstring selectedFolderPath;
-            HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-            if (SUCCEEDED(hr))
+#if defined(_WIN32)
+            const HRESULT initializeResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+            const bool shouldUninitialize = SUCCEEDED(initializeResult);
+            if (FAILED(initializeResult) && initializeResult != RPC_E_CHANGED_MODE)
+                return {};
+
+            IFileDialog* fileDialog = nullptr;
+            HRESULT result = CoCreateInstance(
+                CLSID_FileOpenDialog,
+                nullptr,
+                CLSCTX_INPROC_SERVER,
+                IID_IFileDialog,
+                reinterpret_cast<void**>(&fileDialog));
+
+            std::string selectedFolderPath;
+            if (SUCCEEDED(result))
             {
-                CComPtr<IFileDialog> pfd;
-                hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
-                if (SUCCEEDED(hr))
+                FILEOPENDIALOGOPTIONS options = 0;
+                result = fileDialog->GetOptions(&options);
+                if (SUCCEEDED(result))
+                    result = fileDialog->SetOptions(options | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM);
+
+                if (SUCCEEDED(result))
+                    result = fileDialog->Show(nullptr);
+
+                IShellItem* selectedItem = nullptr;
+                if (SUCCEEDED(result))
+                    result = fileDialog->GetResult(&selectedItem);
+
+                if (SUCCEEDED(result))
                 {
-                    // Set the options to select folders
-                    DWORD dwOptions;
-                    hr = pfd->GetOptions(&dwOptions);
-                    if (SUCCEEDED(hr))
+                    PWSTR widePath = nullptr;
+                    result = selectedItem->GetDisplayName(SIGDN_FILESYSPATH, &widePath);
+                    if (SUCCEEDED(result))
                     {
-                        hr = pfd->SetOptions(dwOptions | FOS_PICKFOLDERS);
-                        if (SUCCEEDED(hr))
-                        {
-                            // Show the dialog
-                            hr = pfd->Show(NULL);
-                            if (SUCCEEDED(hr))
-                            {
-                                CComPtr<IShellItem> psi;
-                                hr = pfd->GetResult(&psi);
-                                if (SUCCEEDED(hr))
-                                {
-                                    PWSTR pszPath = NULL;
-                                    hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-                                    if (SUCCEEDED(hr))
-                                    {
-                                        // Use the selected folder path
-                                        selectedFolderPath = pszPath;
-                                        CoTaskMemFree(pszPath);
-                                    }
-                                }
-                            }
-                        }
+                        selectedFolderPath = wideToUtf8(widePath);
+                        CoTaskMemFree(widePath);
                     }
                 }
-                CoUninitialize();
+
+                if (selectedItem)
+                    selectedItem->Release();
+                fileDialog->Release();
             }
-            return std::string(selectedFolderPath.begin(), selectedFolderPath.end());
+
+            if (shouldUninitialize)
+                CoUninitialize();
+            return selectedFolderPath;
+#else
+            return runLinuxDialog(
+                "zenity --file-selection --directory --title='Choose output directory'",
+                "kdialog --getexistingdirectory .");
+#endif
         }
 		
         static bool downloadFile(const std::string& url, const std::string& outputPath) {
@@ -229,6 +266,54 @@ namespace Referencer {
             return true;
         }
     private:
+#if defined(_WIN32)
+        static std::string wideToUtf8(const wchar_t* text)
+        {
+            if (!text)
+                return {};
+
+            const int requiredSize = WideCharToMultiByte(
+                CP_UTF8, 0, text, -1, nullptr, 0, nullptr, nullptr);
+            if (requiredSize <= 1)
+                return {};
+
+            std::string output(static_cast<std::size_t>(requiredSize), '\0');
+            WideCharToMultiByte(
+                CP_UTF8, 0, text, -1, output.data(), requiredSize, nullptr, nullptr);
+            output.pop_back();
+            return output;
+        }
+#else
+        static std::string runLinuxDialog(const char* zenityCommand, const char* kdialogCommand)
+        {
+            const char* command = nullptr;
+            if (access("/usr/bin/zenity", X_OK) == 0)
+                command = zenityCommand;
+            else if (access("/usr/bin/kdialog", X_OK) == 0)
+                command = kdialogCommand;
+
+            if (!command)
+            {
+                std::cerr << "No supported file dialog found. Install zenity or kdialog." << std::endl;
+                return {};
+            }
+
+            FILE* process = popen(command, "r");
+            if (!process)
+                return {};
+
+            std::string output;
+            char buffer[1024];
+            while (fgets(buffer, sizeof(buffer), process))
+                output += buffer;
+            pclose(process);
+
+            while (!output.empty() && (output.back() == '\n' || output.back() == '\r'))
+                output.pop_back();
+            return output;
+        }
+#endif
+
         static size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
             size_t written = fwrite(ptr, size, nmemb, stream);
             return written;

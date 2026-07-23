@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-#include "Renderer/shader.h"
+#include "Renderer/Shader.h"
 
 namespace Referencer {
 

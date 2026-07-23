@@ -3,15 +3,13 @@
 #include "Window.h"
 
 
-#include "glad\glad.h"
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include "GLFW\glfw3native.h"
 
 
 namespace Referencer {
 
-	class WindowsWindow : public Window
+	class GlfwWindow : public Window
 	{
 	private:
 		virtual void init(std::string& title, unsigned int width, unsigned int height);
@@ -20,13 +18,14 @@ namespace Referencer {
 		std::string m_title;
 		unsigned int m_width, m_height;
 		bool m_VSync;
+		bool m_supportsImGuiViewports;
 
 		//using EventCallbackFn std::function<bool(Event e)>; // asi to este niekde prehodim
 
 		EventCallbackFn m_eventCallback;
 	public:
-		WindowsWindow(std::string& title, unsigned int width, unsigned int height);
-		virtual ~WindowsWindow();
+		GlfwWindow(std::string& title, unsigned int width, unsigned int height);
+		virtual ~GlfwWindow();
 
 		void onUpdate() override;
 
@@ -37,6 +36,7 @@ namespace Referencer {
 		inline void setEventCallback(const EventCallbackFn& callback) override { m_eventCallback = callback; }
 		void setVSync(bool enabled) override;
 		bool isVSync() const override;
+		bool supportsImGuiViewports() const override { return m_supportsImGuiViewports; }
 
 		inline virtual void* getNativeWindow() const { return m_window; }
 	};

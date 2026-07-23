@@ -1,10 +1,10 @@
 #pragma once
 #include "Viewport.h"
-#include "Renderer\MyCamera.h"
-#include "events\MouseEvent.h"
-#include "events\Event.h"
-#include "Renderer\Shader.h"
-#include "Renderer\Model.h"
+#include "Renderer/MyCamera.h"
+#include "events/MouseEvent.h"
+#include "events/Event.h"
+#include "Renderer/Shader.h"
+#include "Renderer/Model.h"
 #include "imgui.h"
 
 // this class can be used only in imgui context

@@ -1,6 +1,6 @@
 #pragma once
 #include "Layer.h"
-#include "events\Event.h"
+#include "events/Event.h"
 
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"

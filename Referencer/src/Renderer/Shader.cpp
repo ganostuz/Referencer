@@ -1,7 +1,7 @@
 #include "rfpch.h"
 #include <fstream>
 #include "Shader.h"
-#include <glm\common.hpp>
+#include <glm/common.hpp>
 
 //#define ASSERT(cond, ...) { if(!(cond)) { std::cout<<"Assertion Failed: "<< __VA_ARGS__ << std::endl; __debugbreak(); } }
 // 

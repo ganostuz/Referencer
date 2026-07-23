@@ -2,20 +2,21 @@
 
 #include "rfpch.h"
 
+#include <filesystem>
 #include <glad/glad.h> 
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
-#include <assimp\config.h>
+#include <assimp/config.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/Logger.hpp>
 #include <assimp/DefaultLogger.hpp>
 
-#include "Renderer\Mesh.h"
-#include "Renderer\Shader.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/Shader.h"
 
 namespace Referencer {
 
@@ -66,8 +67,7 @@ namespace Referencer {
     private:
         unsigned int TextureFromFile(const char* path, const std::string& directory)
         {
-            std::string filename = std::string(path);
-            filename = directory + '\\' + filename;
+            const std::string filename = (std::filesystem::path(directory) / path).string();
 
             unsigned int textureID;
             glGenTextures(1, &textureID);
@@ -81,6 +81,8 @@ namespace Referencer {
                 GLenum format;
                 if (nrComponents == 1)
                     format = GL_RED;
+                else if (nrComponents == 2)
+                    format = GL_RG;
                 else if (nrComponents == 3)
                     format = GL_RGB;
                 else if (nrComponents == 4)
@@ -117,7 +119,7 @@ namespace Referencer {
                 return;
             }
             // retrieve the directory path of the filepath
-            directory = path.substr(0, path.find_last_of('\\'));
+            directory = std::filesystem::path(path).parent_path().string();
 
             // process ASSIMP's root node recursively
             processNode(scene->mRootNode, scene);

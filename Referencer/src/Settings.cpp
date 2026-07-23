@@ -1,10 +1,11 @@
 #include "rfpch.h"
 #include "Settings.h"
 #include "toml.hpp"
+#include <filesystem>
 
 namespace Referencer {
 
-	template<typename T, size_t N>
+	template<typename T, glm::length_t N>
 	void Settings::assignFromTomlArray(const toml::array& arr, glm::vec<N, T>& value) {
 		const size_t size = std::min(arr.size(), static_cast<std::size_t>(N));
 		for (size_t i = 0; i < size; ++i) {
@@ -60,7 +61,7 @@ namespace Referencer {
 		{
 			//error handling, app is throwing exceptions when type or count is wrong
 			const auto data = toml::parse(m_settingsPath);
-			const auto& config = toml::find(data, "global_config");
+			const auto config = toml::find(data, "global_config");
 			// mozes skusit aj cez find_or
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_WindowBg")), m_Settings.ImGuiCol_WindowBg);
 			assignFromTomlArray(toml::get<toml::array>(config.at("ImGuiCol_Header")), m_Settings.ImGuiCol_Header);
@@ -87,7 +88,7 @@ namespace Referencer {
 			if (m_settingsPath == "")
 			{
 				// assert no valid path use local
-				m_settingsPath = "D:\\dev\\temp";
+				m_settingsPath = (std::filesystem::current_path() / "referencer.toml").string();
 			}
 			settingsPath = m_settingsPath;
 		}

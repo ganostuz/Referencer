@@ -1,11 +1,11 @@
 #include "rfpch.h"
 
 #include "Application.h"
-#include "UI\ImGui\UIlayer.h"
-#include "GLFW\glfw3.h"
-#include "glad\glad.h"
+#include "UI/ImGui/UIlayer.h"
+#include "GLFW/glfw3.h"
+#include "glad/glad.h"
 #include "glm/common.hpp"
-#include "assimp\BaseImporter.h"
+#include "assimp/BaseImporter.h"
 #include "TestLayer.h"
 #include "stb_image.h"
 #include "curl/curl.h"
@@ -15,7 +15,7 @@ namespace Referencer {
 
 	Application* Application::s_instance = nullptr;
 	Application::Application()
-		: m_settings("D:/dev/toml_test/global_config.toml") 
+		: m_settings()
 	{
 		s_instance = this;
 		m_running = true;
@@ -96,7 +96,7 @@ namespace Referencer {
 		v["Application"]["font_size"] = 12.0;
 		for (Layer* layer : m_layerStack)
 			layer->serialize(v);
-		std::ofstream file("D:\\dev\\temp\\temp.toml");
+		std::ofstream file("referencer.toml");
 		if (file.is_open()) 
 		{
 			file << std::setw(80) << v;

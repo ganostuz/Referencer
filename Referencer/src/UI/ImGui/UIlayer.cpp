@@ -1,20 +1,32 @@
 #include "rfpch.h"
 #include "UIlayer.h"
 #include <imgui.h>
-#include "events\KeyEvent.h"
-#include "events\ApplicationEvents.h"
-#include "events\MouseEvent.h"
+#include "events/KeyEvent.h"
+#include "events/ApplicationEvents.h"
+#include "events/MouseEvent.h"
 #include "KeyCodes.h"
 #include "Utilities.h"
-#include "thirdParty\imgui_notify.h"
+#include "thirdParty/imgui_notify.h"
 
 #include "imgui_internal.h"
-#include "GLFW\glfw3.h"
-#include "backends\imgui_impl_glfw.h"
-#include "fonts\Roboto.h"
+#include "GLFW/glfw3.h"
+#include "backends/imgui_impl_glfw.h"
+#include "fonts/Roboto.h"
 
 #define IMGUI_COLOR_FROM_GLMVEC4(color) ImVec4((color).x, (color).y, (color).z, (color).w)
 #define ImVec4ToGlmVec4(color) glm::vec4((color).x, (color).y, (color).z, (color).w)
+
+namespace {
+
+    std::filesystem::path referencerSavePath(const std::string& selectedPath)
+    {
+        std::filesystem::path path(selectedPath);
+        if (path.extension() != ".ref2d")
+            path.replace_extension(".ref2d");
+        return path;
+    }
+
+}
 
 //#include "ImGui\imgui_impl_glfw.h"
 
@@ -48,7 +60,8 @@ namespace Referencer {
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+        if (app.getWindow().supportsImGuiViewports())
+            io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -59,11 +72,9 @@ namespace Referencer {
         // Setup Platform/Renderer backends
         //glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 410");
+        ImGui_ImplOpenGL3_Init("#version 330");
         io.Fonts->AddFontFromMemoryCompressedTTF(&Roboto_compressed_data, Roboto_compressed_size, 16.0f);
         ImGui::MergeIconsWithLatestFont(16.f, false);
-        //io.Fonts->AddFontFromFileTTF("D:/dev/Referencer/Referencer/resources/fonts/Roboto-Medium.ttf", 15.0f);
-        //ImFont* font1 = io.Fonts->AddFontFromFileTTF("font.ttf", size_pixels);
     }
 
     void UIlayer::onDetach()
@@ -91,17 +102,6 @@ namespace Referencer {
                 std::string name = "viewport(2D)_";
                 m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
                 m_viewportIndex++;
-                /*try
-                {
-                    std::filesystem::create_symlink(path, "D:\\dev\\" + m_viewports[m_viewportIndex - 1]->getID().get());
-
-                }
-                catch (const std::exception& e)
-                {
-                    std::string idk = e.what();
-                }
-                */
-                
             }
         }
 
@@ -110,7 +110,7 @@ namespace Referencer {
             std::string path = Utilities::saveFileDialog("Referencer file (*.ref2d)\0.ref2d\0");
             if (path != "")
             {
-                std::ofstream file(path + ".ref2d", std::ios::binary);
+                std::ofstream file(referencerSavePath(path), std::ios::binary);
                 for (int i = 0; i < m_viewports.size(); ++i)
                 {
                     Viewport2D* viewport2DPtr = dynamic_cast<Viewport2D*>(m_viewports[i]);
@@ -349,19 +349,6 @@ namespace Referencer {
                         std::string name = "viewport(2D)_";
                         m_viewports.push_back(new Viewport2D(name + std::to_string(m_viewportIndex), true, path));
                         m_viewportIndex++;
-                        /*
-                        try
-                        {
-                        std::filesystem::create_symlink(path, "D:\\dev\\" + m_viewports[m_viewportIndex-1]->getID().get());
-
-                        }
-                        catch (const std::exception& e)
-                        {
-                            std::string idk = e.what();
-                        }*/
-                        
-                        
-                        
                         //m_selected.push_back(false);
                     }
                     ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "file opened successfully!" });
@@ -372,7 +359,7 @@ namespace Referencer {
                     std::string path = Utilities::saveFileDialog("Referencer file (*.ref2d)\0.ref2d\0");
                     if (path != "")
                     {
-                        std::ofstream file(path + ".ref2d", std::ios::binary);
+                        std::ofstream file(referencerSavePath(path), std::ios::binary);
                         for (int i = 0; i < m_viewports.size(); ++i)
                         {
                             Viewport2D* viewport2DPtr = dynamic_cast<Viewport2D*>(m_viewports[i]);
@@ -578,7 +565,11 @@ namespace Referencer {
         }
         if (ImGui::Button("Download"))
         {
-            std::string path(m_outputPathBuffer + "\\23453453." + current_item);
+            const std::filesystem::path outputDirectory = m_save && !m_outputPathBuffer.empty()
+                ? std::filesystem::path(m_outputPathBuffer)
+                : std::filesystem::temp_directory_path();
+            const std::filesystem::path downloadPath = outputDirectory / ("referencer_download." + std::string(current_item));
+            const std::string path = downloadPath.string();
             if (Utilities::downloadFile(m_urlBuffer, path))
                 ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Download successfull!" });
             else
@@ -591,7 +582,7 @@ namespace Referencer {
 
             if (!m_save)
             {
-                remove((m_outputPathBuffer + "\\23453453." + current_item).c_str());
+                std::filesystem::remove(downloadPath);
             }
         }
         ImGui::End();

@@ -2,7 +2,7 @@
 
 #include "rfpch.h"
 #include "Layer.h"
-#include "events\Event.h"
+#include "events/Event.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <filesystem>
@@ -13,14 +13,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <Renderer/Shader.h>
+#include "ResourcePath.h"
 //#include <Renderer/Camera.h>
 #include <Renderer/Model.h>
-#include "events\KeyEvent.h"
-#include "events\MouseEvent.h"
-#include "events\Event.h"
+#include "events/KeyEvent.h"
+#include "events/MouseEvent.h"
+#include "events/Event.h"
 #include "stb_image.h"
 //#include "Renderer\arcball_camera.h"
-#include "Renderer\MyCamera.h"
+#include "Renderer/MyCamera.h"
 
 namespace Referencer {
 	glm::vec2 transform_mouse(glm::vec2 in)
@@ -82,7 +83,7 @@ namespace Referencer {
 		}
 	public:
 		TestLayer(const std::string& name = "Layer")
-			: Layer(name), ourShader("resources/modelShader.vertex", "resources/modelShader.fragment", true), ourCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f, 1.f, 0.f)), ourModel("D:/dev/Referencer/Referencer/resources/objects/backpack/backpack.obj"){}
+			: Layer(name), ourShader(resourcePath("modelShader.vertex").string(), resourcePath("modelShader.fragment").string(), true), ourCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f, 1.f, 0.f)), ourModel(resourcePath("objects/backpack/backpack.obj").string()){}
 		~TestLayer(){}
 
 		void onAttach()

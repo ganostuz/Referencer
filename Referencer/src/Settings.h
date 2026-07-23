@@ -1,6 +1,6 @@
 #pragma once
 #include "rfpch.h"
-#include "glm\glm.hpp"
+#include "glm/glm.hpp"
 #include "toml.hpp"
 
 namespace Referencer
@@ -38,7 +38,7 @@ namespace Referencer
 		SettingsHolder m_Settings;
 		std::string m_settingsPath;
 
-		template<typename T, size_t N>
+		template<typename T, glm::length_t N>
 		void assignFromTomlArray(const toml::array& arr, glm::vec<N, T>& value);
 
 		void initDefaultSettings();

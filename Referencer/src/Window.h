@@ -1,6 +1,6 @@
 #pragma once
 
-#include "events\Event.h"
+#include "events/Event.h"
 
 namespace Referencer {
 
@@ -20,6 +20,7 @@ namespace Referencer {
 		virtual void setEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void setVSync(bool enabled) = 0;
 		virtual bool isVSync() const = 0;
+		virtual bool supportsImGuiViewports() const = 0;
 
 		virtual void* getNativeWindow() const = 0;
 

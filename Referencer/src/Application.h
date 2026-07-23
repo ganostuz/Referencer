@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include "events\ApplicationEvents.h"
+#include "events/ApplicationEvents.h"
 #include "LayerStack.h"
 #include "Settings.h"
 
@@ -28,8 +28,8 @@ namespace Referencer {
 
 	private:
 		Settings m_settings;
-		LayerStack m_layerStack;
 		std::unique_ptr<Window> m_window;
+		LayerStack m_layerStack;
 		bool m_running;
 		static Application* s_instance;
 

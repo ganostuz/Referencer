@@ -1,0 +1,44 @@
+name: Windows Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf input
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-pkgconf
+            mingw-w64-x86_64-glfw
+            mingw-w64-x86_64-assimp
+            mingw-w64-x86_64-curl
+
+      - name: Build and package
+        shell: msys2 {0}
+        run: mingw32-make -j2 package
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Referencer-windows-x64
+          path: dist/Referencer-windows-x64
+          if-no-files-found: error

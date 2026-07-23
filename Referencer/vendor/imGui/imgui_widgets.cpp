@@ -1110,7 +1110,7 @@ bool ImGui::Checkbox(const char* label, bool* v)
     if (window->SkipItems)
         return false;
     ImGuiContext& g = *GImGui;
-    const ImGuiStyle& style = ImGuiStyle::ImGuiStyle();
+    const ImGuiStyle& style = g.Style;
     const ImGuiID id = window->GetID(label);
     const ImVec2 label_size = CalcTextSize(label, NULL, true);
     const ImVec2 pading = ImVec2(2, 2);
